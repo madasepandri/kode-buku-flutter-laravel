@@ -10,7 +10,13 @@ void main() {
 
     await tester.tap(find.text('Lihat daftar task'));
     await tester.pumpAndSettle();
-    expect(find.text('Daftar task'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(TaskListView),
+        matching: find.text('Daftar task'),
+      ),
+      findsOneWidget,
+    );
     expect(find.text('Menyusun laporan'), findsOneWidget);
     expect(find.byType(TaskCard), findsWidgets);
 
