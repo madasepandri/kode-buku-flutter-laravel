@@ -1,121 +1,236 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const TaskManagerApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class TaskManagerApp extends StatelessWidget {
+  const TaskManagerApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Task Management App',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+        useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const TaskHomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class TaskHomePage extends StatefulWidget {
+  const TaskHomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<TaskHomePage> createState() => _TaskHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _TaskHomePageState extends State<TaskHomePage> {
+  int _selectedIndex = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  final List<Map<String, String>> dummyTasks = const [
+    {'title': 'Menyusun laporan', 'status': 'Berjalan', 'dueDate': '15 Okt 2026'},
+    {'title': 'Membaca referensi', 'status': 'Selesai', 'dueDate': '12 Okt 2026'},
+    {'title': 'Menyiapkan presentasi', 'status': 'Berjalan', 'dueDate': '18 Okt 2026'},
+    {'title': 'Memeriksa catatan', 'status': 'Selesai', 'dueDate': '10 Okt 2026'},
+    {'title': 'Merapikan dokumentasi', 'status': 'Berjalan', 'dueDate': '20 Okt 2026'},
+  ];
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+    final completedCount =
+        dummyTasks.where((task) => task['status'] == 'Selesai').length;
+    final pages = [
+      DashboardView(
+        totalCount: dummyTasks.length,
+        completedCount: completedCount,
+        onViewTasks: () => setState(() => _selectedIndex = 1),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
+      TaskListView(tasks: dummyTasks),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Task Management App')),
+      body: pages[_selectedIndex],
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (index) {
+          setState(() => _selectedIndex = index);
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.dashboard_outlined),
+            selectedIcon: Icon(Icons.dashboard),
+            label: 'Dashboard',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.list_alt_outlined),
+            selectedIcon: Icon(Icons.list_alt),
+            label: 'Tasks',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DashboardView extends StatelessWidget {
+  const DashboardView({
+    super.key,
+    required this.totalCount,
+    required this.completedCount,
+    required this.onViewTasks,
+  });
+
+  final int totalCount;
+  final int completedCount;
+  final VoidCallback onViewTasks;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text('Selamat datang', style: Theme.of(context).textTheme.headlineMedium),
+        const SizedBox(height: 8),
+        const Text('Lihat ringkasan task Anda hari ini.'),
+        const SizedBox(height: 24),
+        Row(
           children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            Expanded(
+              child: SummaryTile(
+                label: 'Total task',
+                value: '$totalCount',
+                icon: Icons.assignment_outlined,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: SummaryTile(
+                label: 'Selesai',
+                value: '$completedCount',
+                icon: Icons.check_circle_outline,
+              ),
             ),
           ],
         ),
+        const SizedBox(height: 24),
+        Text('Langkah berikutnya', style: Theme.of(context).textTheme.titleLarge),
+        const SizedBox(height: 8),
+        const Text('Buka daftar untuk melihat task dan tanggal jatuh temponya.'),
+        const SizedBox(height: 16),
+        FilledButton.icon(
+          onPressed: onViewTasks,
+          icon: const Icon(Icons.arrow_forward),
+          label: const Text('Lihat daftar task'),
+        ),
+      ],
+    );
+  }
+}
+
+class SummaryTile extends StatelessWidget {
+  const SummaryTile({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  final String label;
+  final String value;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon),
+          const SizedBox(height: 12),
+          Text(value, style: Theme.of(context).textTheme.headlineMedium),
+          Text(label),
+        ],
+      ),
+    );
+  }
+}
+
+class TaskListView extends StatelessWidget {
+  const TaskListView({super.key, required this.tasks});
+
+  final List<Map<String, String>> tasks;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Daftar task', style: Theme.of(context).textTheme.headlineSmall),
+          const SizedBox(height: 8),
+          Text('${tasks.length} task tersedia'),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ListView.builder(
+              itemCount: tasks.length,
+              itemBuilder: (context, index) {
+                final task = tasks[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: TaskCard(task: task),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TaskCard extends StatelessWidget {
+  const TaskCard({super.key, required this.task});
+
+  final Map<String, String> task;
+
+  @override
+  Widget build(BuildContext context) {
+    final isCompleted = task['status'] == 'Selesai';
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Icon(isCompleted ? Icons.check_circle : Icons.radio_button_unchecked),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(task['title'] ?? '',
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 4),
+                Text('Jatuh tempo: ${task['dueDate'] ?? '-'}'),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(task['status'] ?? ''),
+        ],
       ),
     );
   }
