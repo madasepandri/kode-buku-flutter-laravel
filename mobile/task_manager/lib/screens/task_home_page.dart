@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/task.dart';
 import '../providers/task_provider.dart';
-import 'dashboard_view.dart';
-import 'task_list_view.dart';
+import '../widgets/dashboard_view.dart';
+import '../widgets/task_list_view.dart';
 import 'task_detail_screen.dart';
 import 'task_form_screen.dart';
 

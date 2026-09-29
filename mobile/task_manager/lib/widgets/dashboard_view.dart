@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/summary_tile.dart';
+import 'summary_tile.dart';
 
 class DashboardView extends StatelessWidget {
   const DashboardView({
