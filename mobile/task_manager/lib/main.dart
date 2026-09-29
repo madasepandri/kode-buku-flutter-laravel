@@ -31,11 +31,11 @@ class _TaskHomePageState extends State<TaskHomePage> {
   int _selectedIndex = 0;
 
   final List<Map<String, String>> dummyTasks = const [
-    {'title': 'Menyusun laporan', 'status': 'pending', 'dueDate': '15 Okt 2026'},
-    {'title': 'Membaca referensi', 'status': 'completed', 'dueDate': '12 Okt 2026'},
-    {'title': 'Menyiapkan presentasi', 'status': 'pending', 'dueDate': '18 Okt 2026'},
-    {'title': 'Memeriksa catatan', 'status': 'completed', 'dueDate': '10 Okt 2026'},
-    {'title': 'Merapikan dokumentasi', 'status': 'pending', 'dueDate': '20 Okt 2026'},
+    {'title': 'Menyusun laporan', 'status': 'pending', 'dueDateLabel': '15 Okt 2026'},
+    {'title': 'Membaca referensi', 'status': 'completed', 'dueDateLabel': '12 Okt 2026'},
+    {'title': 'Menyiapkan presentasi', 'status': 'pending', 'dueDateLabel': '18 Okt 2026'},
+    {'title': 'Memeriksa catatan', 'status': 'completed', 'dueDateLabel': '10 Okt 2026'},
+    {'title': 'Merapikan dokumentasi', 'status': 'pending', 'dueDateLabel': '20 Okt 2026'},
   ];
 
   @override
@@ -68,7 +68,7 @@ class _TaskHomePageState extends State<TaskHomePage> {
           NavigationDestination(
             icon: Icon(Icons.list_alt_outlined),
             selectedIcon: Icon(Icons.list_alt),
-            label: 'Tasks',
+            label: 'Daftar task',
           ),
         ],
       ),
@@ -224,7 +224,7 @@ class TaskCard extends StatelessWidget {
                 Text(task['title'] ?? '',
                     style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 4),
-                Text('Jatuh tempo: ${task['dueDate'] ?? '-'}'),
+                Text('Jatuh tempo: ${task['dueDateLabel'] ?? '-'}'),
               ],
             ),
           ),
