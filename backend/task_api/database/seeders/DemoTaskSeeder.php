@@ -27,7 +27,7 @@ class DemoTaskSeeder extends Seeder
             $user->tasks()->firstOrCreate(
                 ['title' => $title],
                 [
-                    'description' => null,
+                    'description' => '',
                     'status' => $status,
                     'priority' => 'medium',
                     'due_date' => $dueDate,
