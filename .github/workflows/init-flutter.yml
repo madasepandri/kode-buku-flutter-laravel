@@ -1,0 +1,37 @@
+name: Inisialisasi proyek Flutter Bab 2
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/init-flutter.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  create-project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Buat proyek Flutter Android
+        run: |
+          mkdir -p mobile
+          cd mobile
+          flutter create --platforms=android task_manager
+      - name: Periksa proyek
+        working-directory: mobile/task_manager
+        run: |
+          flutter --version
+          flutter analyze
+          flutter test
+      - name: Simpan checkpoint Bab 2
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c ch02-project-init
+          git add mobile/task_manager
+          git commit -m 'Inisialisasi proyek Flutter Bab 2'
+          git push origin ch02-project-init
