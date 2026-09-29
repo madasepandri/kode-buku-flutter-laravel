@@ -14,7 +14,6 @@ class TaskManagerApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-        useMaterial3: true,
       ),
       home: const TaskHomePage(),
     );
@@ -32,17 +31,17 @@ class _TaskHomePageState extends State<TaskHomePage> {
   int _selectedIndex = 0;
 
   final List<Map<String, String>> dummyTasks = const [
-    {'title': 'Menyusun laporan', 'status': 'Berjalan', 'dueDate': '15 Okt 2026'},
-    {'title': 'Membaca referensi', 'status': 'Selesai', 'dueDate': '12 Okt 2026'},
-    {'title': 'Menyiapkan presentasi', 'status': 'Berjalan', 'dueDate': '18 Okt 2026'},
-    {'title': 'Memeriksa catatan', 'status': 'Selesai', 'dueDate': '10 Okt 2026'},
-    {'title': 'Merapikan dokumentasi', 'status': 'Berjalan', 'dueDate': '20 Okt 2026'},
+    {'title': 'Menyusun laporan', 'status': 'pending', 'dueDate': '15 Okt 2026'},
+    {'title': 'Membaca referensi', 'status': 'completed', 'dueDate': '12 Okt 2026'},
+    {'title': 'Menyiapkan presentasi', 'status': 'pending', 'dueDate': '18 Okt 2026'},
+    {'title': 'Memeriksa catatan', 'status': 'completed', 'dueDate': '10 Okt 2026'},
+    {'title': 'Merapikan dokumentasi', 'status': 'pending', 'dueDate': '20 Okt 2026'},
   ];
 
   @override
   Widget build(BuildContext context) {
     final completedCount =
-        dummyTasks.where((task) => task['status'] == 'Selesai').length;
+        dummyTasks.where((task) => task['status'] == 'completed').length;
     final pages = [
       DashboardView(
         totalCount: dummyTasks.length,
@@ -206,7 +205,8 @@ class TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isCompleted = task['status'] == 'Selesai';
+    final isCompleted = task['status'] == 'completed';
+    final statusLabel = isCompleted ? 'Selesai' : 'Belum selesai';
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -229,7 +229,7 @@ class TaskCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Text(task['status'] ?? ''),
+          Text(statusLabel),
         ],
       ),
     );
