@@ -26,7 +26,7 @@ class UpdateTaskRequest extends FormRequest
             'description' => ['present', 'string'],
             'due_date' => ['required', 'date_format:Y-m-d'],
             'status' => ['required', Rule::in(['pending', 'completed'])],
-            'priority' => ['required', 'string', 'max:20'],
+            'priority' => ['required', Rule::in(['low', 'medium', 'high'])],
         ];
     }
 }
