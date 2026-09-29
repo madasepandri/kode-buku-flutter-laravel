@@ -12,11 +12,18 @@ class StoreTaskRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->exists('description') && $this->input('description') === null) {
+            $this->merge(['description' => '']);
+        }
+    }
+
     public function rules(): array
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
+            'description' => ['present', 'string'],
             'due_date' => ['required', 'date_format:Y-m-d'],
             'status' => ['sometimes', Rule::in(['pending', 'completed'])],
             'priority' => ['sometimes', Rule::in(['low', 'medium', 'high'])],
