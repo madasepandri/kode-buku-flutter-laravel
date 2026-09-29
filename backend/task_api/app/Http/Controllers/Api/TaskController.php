@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
@@ -25,7 +26,7 @@ class TaskController extends Controller
         return TaskResource::collection($tasks);
     }
 
-    public function store(StoreTaskRequest $request): Response|TaskResource
+    public function store(StoreTaskRequest $request): JsonResponse
     {
         $task = $this->demoUser()->tasks()->create($request->validated());
 
