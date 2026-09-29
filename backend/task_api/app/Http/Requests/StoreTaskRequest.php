@@ -26,7 +26,7 @@ class StoreTaskRequest extends FormRequest
             'description' => ['present', 'string'],
             'due_date' => ['required', 'date_format:Y-m-d'],
             'status' => ['sometimes', Rule::in(['pending', 'completed'])],
-            'priority' => ['sometimes', 'string', 'max:20'],
+            'priority' => ['sometimes', Rule::in(['low', 'medium', 'high'])],
         ];
     }
 }
