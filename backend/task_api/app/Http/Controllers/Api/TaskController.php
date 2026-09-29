@@ -30,7 +30,7 @@ class TaskController extends Controller
     {
         $task = $this->demoUser()->tasks()->create($request->validated());
 
-        return (new TaskResource($task))->response()->setStatusCode(201);
+        return (new TaskResource($task->refresh()))->response()->setStatusCode(201);
     }
 
     public function show(int $id): TaskResource
