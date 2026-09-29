@@ -10,12 +10,12 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained();
             $table->string('title');
-            $table->text('description')->nullable();
+            $table->text('description');
             $table->string('status')->default('pending');
             $table->string('priority')->default('medium');
-            $table->date('due_date')->nullable();
+            $table->date('due_date');
             $table->timestamps();
         });
     }
