@@ -43,17 +43,17 @@ class AuthInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioException error, ErrorInterceptorHandler handler) async {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
     try {
-      if (error.response?.statusCode == 401 &&
-          error.requestOptions.extra['public'] != true) {
+      if (err.response?.statusCode == 401 &&
+          err.requestOptions.extra['public'] != true) {
         await onUnauthorized(
-          error.requestOptions.extra[_requestTokenKey] as String?,
+          err.requestOptions.extra[_requestTokenKey] as String?,
         );
       }
     } catch (_) {
       // Kesalahan pembersihan sesi tidak boleh menahan alur error Dio.
     }
-    handler.next(error);
+    handler.next(err);
   }
 }
