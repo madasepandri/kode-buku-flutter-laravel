@@ -22,6 +22,9 @@ jobs:
       - name: Resolve Flutter dependencies
         working-directory: mobile/task_manager
         run: flutter pub get
+      - name: Format Flutter source
+        working-directory: mobile/task_manager
+        run: dart format lib test
       - name: Analyze Flutter source
         working-directory: mobile/task_manager
         run: flutter analyze
@@ -31,14 +34,14 @@ jobs:
       - name: Commit resolved lockfile when needed
         shell: bash
         run: |
-          if git diff --quiet -- mobile/task_manager/pubspec.lock; then
+          if git diff --quiet -- mobile/task_manager/pubspec.lock mobile/task_manager/lib mobile/task_manager/test; then
             echo "pubspec.lock already synchronized"
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add mobile/task_manager/pubspec.lock
-          git commit -m 'chore(ch13): sync Flutter lockfile'
+          git add mobile/task_manager/pubspec.lock mobile/task_manager/lib mobile/task_manager/test
+          git commit -m 'chore(ch13): sync Flutter formatting and lockfile'
           git push origin HEAD:ch13-advanced-features
 
   backend:

@@ -77,10 +77,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() { _working = true; _message = null; });
     try {
       await context.read<AuthProvider>().uploadAvatar(selected.path, selected.name);
-      if (mounted) setState(() {
+      if (mounted) { setState(() {
         _selected = null;
         _message = 'Avatar berhasil diunggah.';
-      });
+      }); }
     } on AuthException catch (error) {
       if (mounted) setState(() => _message = error.message);
     } catch (_) {

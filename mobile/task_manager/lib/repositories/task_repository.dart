@@ -21,12 +21,11 @@ class TaskRepository {
 
   Future<TaskPage> getTasks({String search = '', String? status,
       String? priority, int page = 1}) async {
-    final body = await _apiService.fetchTasks(query: {
-      if (search.isNotEmpty) 'search': search,
-      if (status != null) 'status': status,
-      if (priority != null) 'priority': priority,
-      'page': page,
-    });
+    final query = <String, dynamic>{'page': page};
+    if (search.isNotEmpty) { query['search'] = search; }
+    if (status != null) { query['status'] = status; }
+    if (priority != null) { query['priority'] = priority; }
+    final body = await _apiService.fetchTasks(query: query);
     try {
       return TaskPage.fromJson(body as Map<String, dynamic>);
     } on FormatException {
