@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/task.dart';
+import '../providers/auth_provider.dart';
 import '../providers/task_provider.dart';
 import '../widgets/dashboard_view.dart';
 import '../widgets/task_list_view.dart';
@@ -52,9 +53,41 @@ class _TaskHomePageState extends State<TaskHomePage> {
     );
   }
 
+  Future<void> _logout() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Keluar dari akun?'),
+        content: const Text('Sesi pada perangkat ini akan diakhiri.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Keluar'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || confirmed != true) return;
+
+    try {
+      await context.read<AuthProvider>().logout();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sesi lokal belum dapat dibersihkan.')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final taskProvider = context.watch<TaskProvider>();
+    final auth = context.watch<AuthProvider>();
     final pages = [
       DashboardView(
         totalCount: taskProvider.totalCount,
@@ -84,7 +117,9 @@ class _TaskHomePageState extends State<TaskHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Task Management App'),
+        title: Text(auth.user == null
+            ? 'Task Management App'
+            : 'Halo, ${auth.user!.name}'),
         actions: [
           IconButton(
             tooltip: 'Muat ulang task',
@@ -92,6 +127,11 @@ class _TaskHomePageState extends State<TaskHomePage> {
                 ? null
                 : _refreshTasks,
             icon: const Icon(Icons.refresh),
+          ),
+          IconButton(
+            tooltip: 'Logout',
+            onPressed: auth.busy ? null : _logout,
+            icon: const Icon(Icons.logout),
           ),
         ],
       ),
