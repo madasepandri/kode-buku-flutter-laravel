@@ -1,25 +1,29 @@
 import '../models/task.dart';
+import '../services/task_api_service.dart';
+import '../utils/task_load_exception.dart';
 
 class TaskRepository {
-  final List<Task> _tasks = [
-    Task(id: 1, title: 'Menyusun laporan', description: '', status: 'pending', dueDate: DateTime(2026, 10, 15)),
-    Task(id: 2, title: 'Membaca referensi', description: '', status: 'completed', dueDate: DateTime(2026, 10, 12)),
-    Task(id: 3, title: 'Menyiapkan presentasi', description: '', status: 'pending', dueDate: DateTime(2026, 10, 18)),
-    Task(id: 4, title: 'Memeriksa catatan', description: '', status: 'completed', dueDate: DateTime(2026, 10, 10)),
-    Task(id: 5, title: 'Merapikan dokumentasi', description: '', status: 'pending', dueDate: DateTime(2026, 10, 20)),
-  ];
-  int _nextId = 6;
+  TaskRepository(this._apiService);
 
-  List<Task> getTasks() => List.unmodifiable(_tasks);
-  Task addTask(Task task) {
-    final saved = Task(id: _nextId++, title: task.title,
-      description: task.description, status: task.status, dueDate: task.dueDate);
-    _tasks.add(saved);
-    return saved;
-  }
-  void updateTask(Task task) {
-    final index = _tasks.indexWhere((item) => item.id == task.id);
-    if (index == -1) throw StateError('Task tidak ditemukan');
-    _tasks[index] = task;
+  final TaskApiService _apiService;
+
+  Future<List<Task>> getTasks() async {
+    final body = await _apiService.fetchTasks();
+    try {
+      if (body is! Map<String, dynamic> || body['data'] is! List) {
+        throw const FormatException();
+      }
+
+      return (body['data'] as List).map((item) {
+        if (item is! Map<String, dynamic>) {
+          throw const FormatException();
+        }
+        return Task.fromJson(item);
+      }).toList(growable: false);
+    } on FormatException {
+      throw const TaskLoadException('Format data dari server tidak sesuai.');
+    } on TypeError {
+      throw const TaskLoadException('Format data dari server tidak sesuai.');
+    }
   }
 }
