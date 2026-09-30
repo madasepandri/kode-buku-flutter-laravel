@@ -22,7 +22,7 @@ class DebugApiLogger extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    _write(error.requestOptions,
+    _write(err.requestOptions,
         '${err.response?.statusCode ?? err.type.name}');
     handler.next(err);
   }
