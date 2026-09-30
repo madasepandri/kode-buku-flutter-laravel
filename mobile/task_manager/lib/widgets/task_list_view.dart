@@ -146,8 +146,10 @@ class _TaskListViewState extends State<TaskListView> {
                     ),
                   if (p.refreshError != null) ...[
                     Text('Daftar belum diperbarui. ${p.refreshError}'),
-                    TextButton(onPressed: p.refreshing ? null : p.refreshTasks,
-                      child: const Text('Coba perbarui lagi')),
+                    TextButton(
+                      onPressed: p.refreshing ? null : p.refreshTasks,
+                      child: const Text('Coba perbarui lagi'),
+                    ),
                   ],
                   for (final task in p.tasks)
                     Padding(
@@ -160,8 +162,12 @@ class _TaskListViewState extends State<TaskListView> {
                   if (p.moreError != null) Text(p.moreError!),
                   if (p.state == TaskLoadState.success && p.hasMore)
                     OutlinedButton(
-                      onPressed: p.loadingMore || p.refreshing || p.refreshError != null
-                          ? null : p.loadMore,
+                      onPressed:
+                          p.loadingMore ||
+                              p.refreshing ||
+                              p.refreshError != null
+                          ? null
+                          : p.loadMore,
                       child: Text(
                         p.loadingMore
                             ? 'Memuat…'

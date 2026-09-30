@@ -90,30 +90,41 @@ void main() {
     expect(p.state, TaskLoadState.success);
     expect(p.loadingMore, false);
   });
-  test('refresh retains snapshot and metadata until replacement succeeds', () async {
-    final next = Completer<TaskPage>();
-    var calls = 0;
-    final p = TaskProvider(FakeRepository((search, current) =>
-      ++calls == 1 ? Future.value(page([1, 2], 1)) : next.future));
-    addTearDown(p.dispose);
-    await p.fetchTasks();
-    final refreshing = p.refreshTasks();
-    expect(p.tasks.map((t) => t.id), [1, 2]);
-    expect(p.currentPage, 1);
-    expect(p.totalCount, 3);
-    expect(p.state, TaskLoadState.success);
-    expect(p.refreshing, true);
-    next.complete(page([9], 1));
-    await refreshing;
-    expect(p.tasks.single.id, 9);
-    expect(p.refreshing, false);
-  });
+  test(
+    'refresh retains snapshot and metadata until replacement succeeds',
+    () async {
+      final next = Completer<TaskPage>();
+      var calls = 0;
+      final p = TaskProvider(
+        FakeRepository(
+          (search, current) =>
+              ++calls == 1 ? Future.value(page([1, 2], 1)) : next.future,
+        ),
+      );
+      addTearDown(p.dispose);
+      await p.fetchTasks();
+      final refreshing = p.refreshTasks();
+      expect(p.tasks.map((t) => t.id), [1, 2]);
+      expect(p.currentPage, 1);
+      expect(p.totalCount, 3);
+      expect(p.state, TaskLoadState.success);
+      expect(p.refreshing, true);
+      next.complete(page([9], 1));
+      await refreshing;
+      expect(p.tasks.single.id, 9);
+      expect(p.refreshing, false);
+    },
+  );
   test('refresh failure keeps snapshot page and total for retry', () async {
     var calls = 0;
-    final p = TaskProvider(FakeRepository((search, current) async {
-      if (++calls > 1) { throw const TaskApiException('offline'); }
-      return page([1, 2], 1);
-    }));
+    final p = TaskProvider(
+      FakeRepository((search, current) async {
+        if (++calls > 1) {
+          throw const TaskApiException('offline');
+        }
+        return page([1, 2], 1);
+      }),
+    );
     addTearDown(p.dispose);
     await p.fetchTasks();
     await p.refreshTasks();
@@ -124,22 +135,28 @@ void main() {
     expect(p.refreshError, 'offline');
     expect(p.refreshing, false);
   });
-  test('refresh of old query cannot overwrite a newly selected query', () async {
-    final next = Completer<TaskPage>();
-    var calls = 0;
-    final p = TaskProvider(FakeRepository((search, current) {
-      if (search == 'new') { return Future.value(page([9], 1)); }
-      return ++calls == 1 ? Future.value(page([1], 1)) : next.future;
-    }));
-    addTearDown(p.dispose);
-    await p.fetchTasks();
-    final oldRefresh = p.refreshTasks();
-    await p.setQuery(search: 'new');
-    next.complete(page([2], 1));
-    await oldRefresh;
-    expect(p.tasks.single.id, 9);
-    expect(p.refreshing, false);
-    expect(p.refreshError, isNull);
-  });
-
+  test(
+    'refresh of old query cannot overwrite a newly selected query',
+    () async {
+      final next = Completer<TaskPage>();
+      var calls = 0;
+      final p = TaskProvider(
+        FakeRepository((search, current) {
+          if (search == 'new') {
+            return Future.value(page([9], 1));
+          }
+          return ++calls == 1 ? Future.value(page([1], 1)) : next.future;
+        }),
+      );
+      addTearDown(p.dispose);
+      await p.fetchTasks();
+      final oldRefresh = p.refreshTasks();
+      await p.setQuery(search: 'new');
+      next.complete(page([2], 1));
+      await oldRefresh;
+      expect(p.tasks.single.id, 9);
+      expect(p.refreshing, false);
+      expect(p.refreshError, isNull);
+    },
+  );
 }

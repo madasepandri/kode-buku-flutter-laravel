@@ -41,7 +41,9 @@ class DashboardView extends StatelessWidget {
         ],
       ),
       const SizedBox(height: 12),
-      const Text('Angka mengikuti pencarian dan filter aktif, serta halaman yang telah dimuat.'),
+      const Text(
+        'Angka mengikuti pencarian dan filter aktif, serta halaman yang telah dimuat.',
+      ),
       const SizedBox(height: 24),
       Text('Langkah berikutnya', style: Theme.of(context).textTheme.titleLarge),
       const SizedBox(height: 8),

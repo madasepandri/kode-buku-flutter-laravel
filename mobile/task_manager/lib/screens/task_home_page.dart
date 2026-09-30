@@ -34,7 +34,9 @@ class _TaskHomePageState extends State<TaskHomePage> {
     await provider.refreshTasks();
     if (!mounted || provider.refreshError == null) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Daftar belum diperbarui. ${provider.refreshError}')),
+      SnackBar(
+        content: Text('Daftar belum diperbarui. ${provider.refreshError}'),
+      ),
     );
   }
 
@@ -135,7 +137,9 @@ class _TaskHomePageState extends State<TaskHomePage> {
         actions: [
           IconButton(
             tooltip: 'Muat ulang task',
-            onPressed: taskProvider.state == TaskLoadState.loading || taskProvider.refreshing
+            onPressed:
+                taskProvider.state == TaskLoadState.loading ||
+                    taskProvider.refreshing
                 ? null
                 : _refreshTasks,
             icon: const Icon(Icons.refresh),

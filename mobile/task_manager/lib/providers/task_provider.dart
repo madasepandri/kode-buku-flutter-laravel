@@ -125,7 +125,9 @@ class TaskProvider extends ChangeNotifier {
   }
 
   Future<void> refreshTasks() async {
-    if (_refreshing) { return; }
+    if (_refreshing) {
+      return;
+    }
     if (_state != TaskLoadState.success) {
       await fetchTasks();
       return;
@@ -139,7 +141,10 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
     try {
       final result = await _repository.getTasks(
-        search: _search, status: _status, priority: _priority);
+        search: _search,
+        status: _status,
+        priority: _priority,
+      );
       if (!_isCurrent(generation) || queryGeneration != _queryGeneration) {
         return;
       }
@@ -166,8 +171,11 @@ class TaskProvider extends ChangeNotifier {
   }
 
   Future<void> loadMore() async {
-    if (_state != TaskLoadState.success || _loadingMore || _refreshing ||
-        _refreshError != null || !hasMore) {
+    if (_state != TaskLoadState.success ||
+        _loadingMore ||
+        _refreshing ||
+        _refreshError != null ||
+        !hasMore) {
       return;
     }
     final generation = _sessionGeneration;
