@@ -1,0 +1,66 @@
+name: Verify Chapter 12 checkpoint
+
+on:
+  push:
+    branches: [ch12-auth-integration]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  flutter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ch12-auth-integration
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Resolve Flutter dependencies
+        working-directory: mobile/task_manager
+        run: flutter pub get
+      - name: Analyze Flutter source
+        working-directory: mobile/task_manager
+        run: flutter analyze
+      - name: Run Flutter tests
+        working-directory: mobile/task_manager
+        run: flutter test
+      - name: Commit resolved lockfile when needed
+        shell: bash
+        run: |
+          if git diff --quiet -- mobile/task_manager/pubspec.lock; then
+            echo "pubspec.lock already synchronized"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add mobile/task_manager/pubspec.lock
+          git commit -m 'chore(ch12): sync Flutter lockfile'
+          git push origin HEAD:ch12-auth-integration
+
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ch12-auth-integration
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+      - name: Validate Composer definition
+        working-directory: backend/task_api
+        run: composer validate --no-check-publish
+      - name: Install backend dependencies
+        working-directory: backend/task_api
+        run: composer install --no-interaction --prefer-dist
+      - name: Check PHP syntax
+        working-directory: backend/task_api
+        shell: bash
+        run: find app routes database/migrations -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Check API routes
+        working-directory: backend/task_api
+        run: php artisan route:list --path=api
