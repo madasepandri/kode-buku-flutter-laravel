@@ -62,7 +62,9 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> login(String email, String password) async {
-    if (_busy) { return; }
+    if (_busy) {
+      return;
+    }
     _busy = true;
     notifyListeners();
 
@@ -80,7 +82,9 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> expireSession(String? requestToken) async {
-    if (requestToken == null || requestToken.isEmpty) { return; }
+    if (requestToken == null || requestToken.isEmpty) {
+      return;
+    }
     final currentToken = await _repository.storedToken();
     if (currentToken != requestToken) {
       return;
@@ -127,7 +131,9 @@ class AuthProvider extends ChangeNotifier {
   Future<void> clearDeviceSession() => _endLocalSession();
 
   Future<void> logout() async {
-    if (_busy) { return; }
+    if (_busy) {
+      return;
+    }
     _busy = true;
     notifyListeners();
 
@@ -144,4 +150,3 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 }
-

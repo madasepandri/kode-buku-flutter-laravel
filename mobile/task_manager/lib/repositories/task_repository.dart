@@ -4,27 +4,37 @@ import '../services/task_api_service.dart';
 import '../utils/task_api_exception.dart';
 
 Map<String, dynamic> _taskPayload(Task task) => {
-      'title': task.title.trim(),
-      'description': task.description.trim(),
-      'status': task.status,
-      'priority': task.priority,
-      'due_date':
-          '${task.dueDate.year.toString().padLeft(4, '0')}-'
-          '${task.dueDate.month.toString().padLeft(2, '0')}-'
-          '${task.dueDate.day.toString().padLeft(2, '0')}',
-    };
+  'title': task.title.trim(),
+  'description': task.description.trim(),
+  'status': task.status,
+  'priority': task.priority,
+  'due_date':
+      '${task.dueDate.year.toString().padLeft(4, '0')}-'
+      '${task.dueDate.month.toString().padLeft(2, '0')}-'
+      '${task.dueDate.day.toString().padLeft(2, '0')}',
+};
 
 class TaskRepository {
   TaskRepository(this._apiService);
 
   final TaskApiService _apiService;
 
-  Future<TaskPage> getTasks({String search = '', String? status,
-      String? priority, int page = 1}) async {
+  Future<TaskPage> getTasks({
+    String search = '',
+    String? status,
+    String? priority,
+    int page = 1,
+  }) async {
     final query = <String, dynamic>{'page': page};
-    if (search.isNotEmpty) { query['search'] = search; }
-    if (status != null) { query['status'] = status; }
-    if (priority != null) { query['priority'] = priority; }
+    if (search.isNotEmpty) {
+      query['search'] = search;
+    }
+    if (status != null) {
+      query['status'] = status;
+    }
+    if (priority != null) {
+      query['priority'] = priority;
+    }
     final body = await _apiService.fetchTasks(query: query);
     try {
       return TaskPage.fromJson(body as Map<String, dynamic>);
@@ -56,9 +66,8 @@ class TaskRepository {
       _taskFromResponse(await _apiService.createTask(_taskPayload(draft)));
 
   Future<Task> updateTask(Task draft) async => _taskFromResponse(
-        await _apiService.updateTask(draft.id, _taskPayload(draft)),
-      );
+    await _apiService.updateTask(draft.id, _taskPayload(draft)),
+  );
 
   Future<void> deleteTask(int id) => _apiService.deleteTask(id);
 }
-

@@ -34,14 +34,13 @@ class _TaskHomePageState extends State<TaskHomePage> {
   }
 
   Future<void> _addTask() async {
-    final saved = await Navigator.of(context).push<Task>(
-      MaterialPageRoute(builder: (_) => const TaskFormScreen()),
-    );
+    final saved = await Navigator.of(context)
+        .push<Task>(MaterialPageRoute(builder: (_) => const TaskFormScreen()));
     if (!mounted || saved == null) return;
     setState(() => _selectedIndex = 1);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Task berhasil ditambahkan.')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Task berhasil ditambahkan.')));
   }
 
   Future<void> _openDetail(Task task) async {
@@ -49,9 +48,8 @@ class _TaskHomePageState extends State<TaskHomePage> {
       MaterialPageRoute(builder: (_) => TaskDetailScreen(task: task)),
     );
     if (!mounted || deleted != true) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Task berhasil dihapus.')),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Task berhasil dihapus.')));
   }
 
   Future<void> _logout() async {
@@ -111,7 +109,10 @@ class _TaskHomePageState extends State<TaskHomePage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(taskProvider.errorMessage ?? 'Gagal memuat task.'),
-            TextButton(onPressed: _refreshTasks, child: const Text('Coba lagi')),
+            TextButton(
+              onPressed: _refreshTasks,
+              child: const Text('Coba lagi'),
+            ),
           ],
         ),
       );
@@ -121,9 +122,11 @@ class _TaskHomePageState extends State<TaskHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(auth.user == null
-            ? 'Task Management App'
-            : 'Halo, ${auth.user!.name}'),
+        title: Text(
+          auth.user == null
+              ? 'Task Management App'
+              : 'Halo, ${auth.user!.name}',
+        ),
         actions: [
           IconButton(
             tooltip: 'Muat ulang task',
@@ -140,7 +143,8 @@ class _TaskHomePageState extends State<TaskHomePage> {
         ],
       ),
       body: content,
-      floatingActionButton: _selectedIndex != 2 && taskProvider.state == TaskLoadState.success
+      floatingActionButton:
+          _selectedIndex != 2 && taskProvider.state == TaskLoadState.success
           ? FloatingActionButton.extended(
               onPressed: _addTask,
               icon: const Icon(Icons.add),
@@ -149,9 +153,9 @@ class _TaskHomePageState extends State<TaskHomePage> {
           : null,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) => setState(() => _selectedIndex = index),
+        onDestinationSelected: (index) =>
+            setState(() => _selectedIndex = index),
         destinations: const [
-
           NavigationDestination(
             icon: Icon(Icons.dashboard_outlined),
             selectedIcon: Icon(Icons.dashboard),
@@ -162,11 +166,13 @@ class _TaskHomePageState extends State<TaskHomePage> {
             selectedIcon: Icon(Icons.list_alt),
             label: 'Daftar task',
           ),
-          NavigationDestination(icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person), label: 'Profil'),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: 'Profil',
+          ),
         ],
       ),
     );
   }
 }
-

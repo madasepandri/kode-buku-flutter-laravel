@@ -30,7 +30,9 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.task?.title ?? '');
-    _descriptionController = TextEditingController(text: widget.task?.description ?? '');
+    _descriptionController = TextEditingController(
+      text: widget.task?.description ?? '',
+    );
     _selectedDate = widget.task?.dueDate;
     _dateController = TextEditingController(
       text: _selectedDate == null ? '' : formatDueDate(_selectedDate!),
@@ -119,86 +121,89 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text(widget.task == null ? 'Tambah task' : 'Edit task')),
-        body: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(20),
-            children: [
-              TextFormField(
-                controller: _titleController,
-                enabled: !_isSubmitting,
-                decoration: const InputDecoration(labelText: 'Judul task'),
-                validator: (value) => (value?.trim().isEmpty ?? true)
-                    ? 'Judul task wajib diisi'
-                    : null,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _descriptionController,
-                enabled: !_isSubmitting,
-                decoration: const InputDecoration(labelText: 'Deskripsi (opsional)'),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                initialValue: _status,
-                decoration: const InputDecoration(labelText: 'Status'),
-                items: const [
-                  DropdownMenuItem(value: 'pending', child: Text('Belum selesai')),
-                  DropdownMenuItem(value: 'completed', child: Text('Selesai')),
-                ],
-                onChanged: _isSubmitting
-                    ? null
-                    : (value) => setState(() => _status = value ?? 'pending'),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                initialValue: _priority,
-                decoration: const InputDecoration(labelText: 'Prioritas'),
-                items: const [
-                  DropdownMenuItem(value: 'low', child: Text('Rendah')),
-                  DropdownMenuItem(value: 'medium', child: Text('Sedang')),
-                  DropdownMenuItem(value: 'high', child: Text('Tinggi')),
-                ],
-                onChanged: _isSubmitting
-                    ? null
-                    : (value) => setState(() => _priority = value ?? 'medium'),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _dateController,
-                readOnly: true,
-                enabled: !_isSubmitting,
-                onTap: _chooseDate,
-                decoration: const InputDecoration(
-                  labelText: 'Jatuh tempo',
-                  suffixIcon: Icon(Icons.calendar_today),
-                ),
-                validator: (value) => (value?.isEmpty ?? true)
-                    ? 'Pilih tanggal jatuh tempo'
-                    : null,
-              ),
-              if (_submitError != null) ...[
-                const SizedBox(height: 16),
-                Text(
-                  _submitError!,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
-              ],
-              const SizedBox(height: 24),
-              FilledButton(
-                onPressed: _isSubmitting ? null : _save,
-                child: _isSubmitting
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Simpan task'),
-              ),
-            ],
+    appBar: AppBar(
+      title: Text(widget.task == null ? 'Tambah task' : 'Edit task'),
+    ),
+    body: Form(
+      key: _formKey,
+      child: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          TextFormField(
+            controller: _titleController,
+            enabled: !_isSubmitting,
+            decoration: const InputDecoration(labelText: 'Judul task'),
+            validator: (value) => (value?.trim().isEmpty ?? true)
+                ? 'Judul task wajib diisi'
+                : null,
           ),
-        ),
-      );
+          const SizedBox(height: 16),
+          TextField(
+            controller: _descriptionController,
+            enabled: !_isSubmitting,
+            decoration: const InputDecoration(
+              labelText: 'Deskripsi (opsional)',
+            ),
+            maxLines: 3,
+          ),
+          const SizedBox(height: 16),
+          DropdownButtonFormField<String>(
+            initialValue: _status,
+            decoration: const InputDecoration(labelText: 'Status'),
+            items: const [
+              DropdownMenuItem(value: 'pending', child: Text('Belum selesai')),
+              DropdownMenuItem(value: 'completed', child: Text('Selesai')),
+            ],
+            onChanged: _isSubmitting
+                ? null
+                : (value) => setState(() => _status = value ?? 'pending'),
+          ),
+          const SizedBox(height: 16),
+          DropdownButtonFormField<String>(
+            initialValue: _priority,
+            decoration: const InputDecoration(labelText: 'Prioritas'),
+            items: const [
+              DropdownMenuItem(value: 'low', child: Text('Rendah')),
+              DropdownMenuItem(value: 'medium', child: Text('Sedang')),
+              DropdownMenuItem(value: 'high', child: Text('Tinggi')),
+            ],
+            onChanged: _isSubmitting
+                ? null
+                : (value) => setState(() => _priority = value ?? 'medium'),
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _dateController,
+            readOnly: true,
+            enabled: !_isSubmitting,
+            onTap: _chooseDate,
+            decoration: const InputDecoration(
+              labelText: 'Jatuh tempo',
+              suffixIcon: Icon(Icons.calendar_today),
+            ),
+            validator: (value) =>
+                (value?.isEmpty ?? true) ? 'Pilih tanggal jatuh tempo' : null,
+          ),
+          if (_submitError != null) ...[
+            const SizedBox(height: 16),
+            Text(
+              _submitError!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+          ],
+          const SizedBox(height: 24),
+          FilledButton(
+            onPressed: _isSubmitting ? null : _save,
+            child: _isSubmitting
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('Simpan task'),
+          ),
+        ],
+      ),
+    ),
+  );
 }

@@ -60,8 +60,11 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setQuery({required String search, String? status,
-      String? priority}) async {
+  Future<void> setQuery({
+    required String search,
+    String? status,
+    String? priority,
+  }) async {
     _search = search.trim();
     _status = status;
     _priority = priority;
@@ -83,19 +86,28 @@ class TaskProvider extends ChangeNotifier {
 
     try {
       final result = await _repository.getTasks(
-        search: _search, status: _status, priority: _priority);
-      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) { return; }
+        search: _search,
+        status: _status,
+        priority: _priority,
+      );
+      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) {
+        return;
+      }
       _tasks = result.items;
       _page = result.currentPage;
       _lastPage = result.lastPage;
       _total = result.total;
       _state = TaskLoadState.success;
     } on TaskApiException catch (error) {
-      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) { return; }
+      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) {
+        return;
+      }
       _state = TaskLoadState.error;
       _errorMessage = error.message;
     } catch (_) {
-      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) { return; }
+      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) {
+        return;
+      }
       _state = TaskLoadState.error;
       _errorMessage = 'Data task tidak dapat diproses.';
     }
@@ -105,26 +117,38 @@ class TaskProvider extends ChangeNotifier {
   }
 
   Future<void> loadMore() async {
-    if (_state != TaskLoadState.success || _loadingMore || !hasMore) { return; }
+    if (_state != TaskLoadState.success || _loadingMore || !hasMore) {
+      return;
+    }
     final generation = _sessionGeneration;
     final queryGeneration = _queryGeneration;
     _loadingMore = true;
     _moreError = null;
     notifyListeners();
     try {
-      final result = await _repository.getTasks(search: _search,
-        status: _status, priority: _priority, page: _page + 1);
-      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) { return; }
+      final result = await _repository.getTasks(
+        search: _search,
+        status: _status,
+        priority: _priority,
+        page: _page + 1,
+      );
+      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) {
+        return;
+      }
       final ids = _tasks.map((task) => task.id).toSet();
       _tasks = [..._tasks, ...result.items.where((task) => ids.add(task.id))];
       _page = result.currentPage;
       _lastPage = result.lastPage;
       _total = result.total;
     } on TaskApiException catch (error) {
-      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) { return; }
+      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) {
+        return;
+      }
       _moreError = error.message;
     } catch (_) {
-      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) { return; }
+      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) {
+        return;
+      }
       _moreError = 'Halaman berikutnya gagal diproses.';
     } finally {
       if (_isCurrent(generation) && queryGeneration == _queryGeneration) {
@@ -138,7 +162,9 @@ class TaskProvider extends ChangeNotifier {
     final generation = _sessionGeneration;
     final task = await _repository.getTask(id);
     if (!_isCurrent(generation)) {
-      throw const TaskApiException('Sesi telah berubah. Buka kembali task pada akun aktif.');
+      throw const TaskApiException(
+        'Sesi telah berubah. Buka kembali task pada akun aktif.',
+      );
     }
     return task;
   }
@@ -147,7 +173,9 @@ class TaskProvider extends ChangeNotifier {
     final generation = _sessionGeneration;
     final saved = await _repository.createTask(draft);
     if (!_isCurrent(generation)) {
-      throw const TaskApiException('Sesi telah berubah. Ulangi operasi pada akun aktif.');
+      throw const TaskApiException(
+        'Sesi telah berubah. Ulangi operasi pada akun aktif.',
+      );
     }
     await fetchTasks();
     return saved;
@@ -157,7 +185,9 @@ class TaskProvider extends ChangeNotifier {
     final generation = _sessionGeneration;
     final saved = await _repository.updateTask(draft);
     if (!_isCurrent(generation)) {
-      throw const TaskApiException('Sesi telah berubah. Ulangi operasi pada akun aktif.');
+      throw const TaskApiException(
+        'Sesi telah berubah. Ulangi operasi pada akun aktif.',
+      );
     }
     await fetchTasks();
     return saved;
@@ -166,8 +196,9 @@ class TaskProvider extends ChangeNotifier {
   Future<void> deleteTask(int id) async {
     final generation = _sessionGeneration;
     await _repository.deleteTask(id);
-    if (!_isCurrent(generation)) { return; }
+    if (!_isCurrent(generation)) {
+      return;
+    }
     await fetchTasks();
   }
 }
-

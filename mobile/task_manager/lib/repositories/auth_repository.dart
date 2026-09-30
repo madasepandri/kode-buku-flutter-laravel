@@ -55,7 +55,8 @@ class AuthRepository {
     }
   }
 
-  Future<AppUser> currentUser() async => _userFromBody(await _api.currentUser());
+  Future<AppUser> currentUser() async =>
+      _userFromBody(await _api.currentUser());
 
   Future<AppUser> updateProfile(String name, String email) async =>
       _userFromBody(await _api.updateProfile(name, email));
@@ -65,4 +66,3 @@ class AuthRepository {
 
   Future<void> logoutRemotely() => _api.logout();
 }
-

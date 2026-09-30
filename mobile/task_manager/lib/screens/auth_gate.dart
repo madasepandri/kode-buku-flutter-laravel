@@ -13,28 +13,29 @@ class AuthGate extends StatelessWidget {
     final auth = context.watch<AuthProvider>();
 
     final Widget page = switch (auth.state) {
-      AuthState.checking =>
-        const Scaffold(body: Center(child: CircularProgressIndicator())),
+      AuthState.checking => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
       AuthState.signedOut => const LoginScreen(),
       AuthState.signedIn => TaskHomePage(key: ValueKey(auth.user!.id)),
       AuthState.retryableError => Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(auth.errorMessage ?? 'Sesi belum dapat diperiksa.'),
-                TextButton(
-                  onPressed: auth.restore,
-                  child: const Text('Coba lagi'),
-                ),
-                TextButton(
-                  onPressed: auth.clearDeviceSession,
-                  child: const Text('Hapus sesi di perangkat'),
-                ),
-              ],
-            ),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(auth.errorMessage ?? 'Sesi belum dapat diperiksa.'),
+              TextButton(
+                onPressed: auth.restore,
+                child: const Text('Coba lagi'),
+              ),
+              TextButton(
+                onPressed: auth.clearDeviceSession,
+                child: const Text('Hapus sesi di perangkat'),
+              ),
+            ],
           ),
         ),
+      ),
     };
 
     return Navigator(

@@ -12,10 +12,9 @@ class AppUser {
   final String? avatarUrl;
 
   factory AppUser.fromJson(Map<String, dynamic> json) => AppUser(
-        id: json['id'] as int,
-        name: json['name'] as String,
-        email: json['email'] as String,
-      avatarUrl: json['avatar_url'] as String?,
-      );
+    id: json['id'] as int,
+    name: json['name'] as String,
+    email: json['email'] as String,
+    avatarUrl: json['avatar_url'] as String?,
+  );
 }
-

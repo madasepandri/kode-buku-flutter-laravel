@@ -31,9 +31,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       await context.read<AuthProvider>().login(
-            _emailController.text.trim(),
-            _passwordController.text,
-          );
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
     } on AuthException catch (error) {
       if (mounted) setState(() => _errorMessage = error.message);
     } catch (_) {
@@ -42,9 +42,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _openRegister() async {
-    final email = await Navigator.of(context).push<String>(
-      MaterialPageRoute(builder: (_) => const RegisterScreen()),
-    );
+    final email = await Navigator.of(
+      context,
+    ).push<String>(MaterialPageRoute(builder: (_) => const RegisterScreen()));
     if (!mounted || email == null) return;
     _emailController.text = email;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -83,7 +83,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     validator: (value) {
                       final email = value?.trim() ?? '';
                       if (email.isEmpty) return 'Email wajib diisi';
-                      if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email)) {
+                      if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+                          .hasMatch(email)) {
                         return 'Format email belum sesuai';
                       }
                       return null;
@@ -103,7 +104,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 16),
                     Text(
                       _errorMessage!,
-                      style: TextStyle(color: Theme.of(context).colorScheme.error),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
                     ),
                   ],
                   const SizedBox(height: 24),

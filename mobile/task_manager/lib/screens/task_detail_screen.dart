@@ -33,14 +33,14 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   }
 
   Future<void> _edit(Task task) async {
-    final saved = await Navigator.of(context).push<Task>(
-      MaterialPageRoute(builder: (_) => TaskFormScreen(task: task)),
-    );
+    final saved = await Navigator.of(
+      context,
+    ).push<Task>(MaterialPageRoute(builder: (_) => TaskFormScreen(task: task)));
     if (!mounted || saved == null) return;
     setState(() => _detailFuture = Future.value(saved));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Task berhasil diperbarui.')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Task berhasil diperbarui.')));
   }
 
   Future<void> _delete(Task task) async {
@@ -73,15 +73,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       Navigator.of(context).pop(true);
     } on TaskApiException catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error.message)),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.message)));
       }
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Task gagal dihapus.')),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Task gagal dihapus.')));
       }
     } finally {
       if (mounted && !deletedSuccessfully) {
@@ -107,9 +105,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         Text('Prioritas: $priority'),
         Text('Jatuh tempo: ${formatDueDate(task.dueDate)}'),
         const SizedBox(height: 12),
-        Text(task.description.isNotEmpty
-            ? task.description
-            : 'Belum ada deskripsi.'),
+        Text(
+          task.description.isNotEmpty
+              ? task.description
+              : 'Belum ada deskripsi.',
+        ),
         const SizedBox(height: 24),
         FilledButton.icon(
           onPressed: _isDeleting ? null : () => _edit(task),

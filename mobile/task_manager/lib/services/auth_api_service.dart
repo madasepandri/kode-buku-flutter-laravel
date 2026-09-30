@@ -49,9 +49,11 @@ class AuthApiService {
 
   Future<dynamic> updateProfile(String name, String email) async {
     try {
-      return (await _dio.put<dynamic>('/user', data: {
-        'name': name.trim(), 'email': email.trim(),
-      }, options: Options(contentType: Headers.jsonContentType))).data;
+      return (await _dio.put<dynamic>(
+        '/user',
+        data: {'name': name.trim(), 'email': email.trim()},
+        options: Options(contentType: Headers.jsonContentType),
+      )).data;
     } on DioException catch (error) {
       throw AuthException(_message(error, operation: 'profile'));
     }
@@ -109,4 +111,3 @@ class AuthApiService {
         : 'Proses autentikasi gagal. Coba lagi.';
   }
 }
-

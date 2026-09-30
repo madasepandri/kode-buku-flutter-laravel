@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../models/task.dart';
 import '../providers/task_provider.dart';
 import 'task_card.dart';
@@ -18,8 +19,12 @@ class _TaskListViewState extends State<TaskListView> {
     super.initState();
     _search = TextEditingController(text: context.read<TaskProvider>().search);
   }
+
   @override
-  void dispose() { _search.dispose(); super.dispose(); }
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,80 +32,144 @@ class _TaskListViewState extends State<TaskListView> {
     final loading = p.state == TaskLoadState.loading;
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Column(children: [
-        TextField(
-          controller: _search,
-          maxLength: 100,
-          textInputAction: TextInputAction.search,
-          decoration: InputDecoration(labelText: 'Cari judul task',
-            counterText: '', suffixIcon: IconButton(icon: const Icon(Icons.search),
-              onPressed: () => p.setQuery(search: _search.text,
-                status: p.status, priority: p.priority))),
-          onSubmitted: (value) => p.setQuery(search: value,
-            status: p.status, priority: p.priority),
-        ),
-        const SizedBox(height: 12),
-        Row(children: [
-          Expanded(child: DropdownButtonFormField<String>(
-            key: ValueKey('status-${p.status}'),
-            initialValue: p.status ?? '',
-            decoration: const InputDecoration(labelText: 'Status'),
-            items: const [
-              DropdownMenuItem(value: '', child: Text('Semua')),
-              DropdownMenuItem(value: 'pending', child: Text('Belum selesai')),
-              DropdownMenuItem(value: 'completed', child: Text('Selesai')),
-            ],
-            onChanged: (value) => p.setQuery(search: p.search,
-              status: value == '' ? null : value, priority: p.priority),
-          )),
-          const SizedBox(width: 12),
-          Expanded(child: DropdownButtonFormField<String>(
-            key: ValueKey('priority-${p.priority}'),
-            initialValue: p.priority ?? '',
-            decoration: const InputDecoration(labelText: 'Prioritas'),
-            items: const [
-              DropdownMenuItem(value: '', child: Text('Semua')),
-              DropdownMenuItem(value: 'low', child: Text('Rendah')),
-              DropdownMenuItem(value: 'medium', child: Text('Sedang')),
-              DropdownMenuItem(value: 'high', child: Text('Tinggi')),
-            ],
-            onChanged: (value) => p.setQuery(search: p.search,
-              status: p.status, priority: value == '' ? null : value),
-          )),
-        ]),
-        Row(children: [
-          Expanded(child: Text('${p.tasks.length} dari ${p.totalCount} task hasil pencarian')),
-          TextButton(onPressed: () {
-            _search.clear();
-            p.setQuery(search: '');
-          }, child: const Text('Reset')),
-        ]),
-        if (loading) const LinearProgressIndicator(),
-        Expanded(child: RefreshIndicator(
-          onRefresh: p.fetchTasks,
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
+      child: Column(
+        children: [
+          TextField(
+            controller: _search,
+            maxLength: 100,
+            textInputAction: TextInputAction.search,
+            decoration: InputDecoration(
+              labelText: 'Cari judul task',
+              counterText: '',
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () => p.setQuery(
+                  search: _search.text,
+                  status: p.status,
+                  priority: p.priority,
+                ),
+              ),
+            ),
+            onSubmitted: (value) => p.setQuery(
+              search: value,
+              status: p.status,
+              priority: p.priority,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
             children: [
-              if (p.state == TaskLoadState.error) ...[
-                Text(p.errorMessage ?? 'Task gagal dimuat.'),
-                TextButton(onPressed: p.fetchTasks, child: const Text('Coba lagi')),
-              ] else if (p.state == TaskLoadState.success && p.tasks.isEmpty)
-                Padding(padding: const EdgeInsets.all(24),
-                  child: Text(p.search.isEmpty && p.status == null && p.priority == null
-                    ? 'Belum ada task. Tekan Tambah task untuk memulai.'
-                    : 'Tidak ada task yang sesuai. Ubah atau reset pencarian.')),
-              for (final task in p.tasks)
-                Padding(padding: const EdgeInsets.only(bottom: 12),
-                  child: TaskCard(task: task, onTap: () => widget.onTaskTap(task))),
-              if (p.moreError != null) Text(p.moreError!),
-              if (p.state == TaskLoadState.success && p.hasMore)
-                OutlinedButton(onPressed: p.loadingMore ? null : p.loadMore,
-                  child: Text(p.loadingMore ? 'Memuat…' : p.moreError == null
-                    ? 'Muat lagi' : 'Coba muat lagi')),
+              Expanded(
+                child: DropdownButtonFormField<String>(
+                  key: ValueKey('status-${p.status}'),
+                  initialValue: p.status ?? '',
+                  decoration: const InputDecoration(labelText: 'Status'),
+                  items: const [
+                    DropdownMenuItem(value: '', child: Text('Semua')),
+                    DropdownMenuItem(
+                      value: 'pending',
+                      child: Text('Belum selesai'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'completed',
+                      child: Text('Selesai'),
+                    ),
+                  ],
+                  onChanged: (value) => p.setQuery(
+                    search: p.search,
+                    status: value == '' ? null : value,
+                    priority: p.priority,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: DropdownButtonFormField<String>(
+                  key: ValueKey('priority-${p.priority}'),
+                  initialValue: p.priority ?? '',
+                  decoration: const InputDecoration(labelText: 'Prioritas'),
+                  items: const [
+                    DropdownMenuItem(value: '', child: Text('Semua')),
+                    DropdownMenuItem(value: 'low', child: Text('Rendah')),
+                    DropdownMenuItem(value: 'medium', child: Text('Sedang')),
+                    DropdownMenuItem(value: 'high', child: Text('Tinggi')),
+                  ],
+                  onChanged: (value) => p.setQuery(
+                    search: p.search,
+                    status: p.status,
+                    priority: value == '' ? null : value,
+                  ),
+                ),
+              ),
             ],
           ),
-        )),
-      ]),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '${p.tasks.length} dari ${p.totalCount} task hasil pencarian',
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  _search.clear();
+                  p.setQuery(search: '');
+                },
+                child: const Text('Reset'),
+              ),
+            ],
+          ),
+          if (loading) const LinearProgressIndicator(),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: p.fetchTasks,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  if (p.state == TaskLoadState.error) ...[
+                    Text(p.errorMessage ?? 'Task gagal dimuat.'),
+                    TextButton(
+                      onPressed: p.fetchTasks,
+                      child: const Text('Coba lagi'),
+                    ),
+                  ] else if (p.state == TaskLoadState.success &&
+                      p.tasks.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        p.search.isEmpty &&
+                                p.status == null &&
+                                p.priority == null
+                            ? 'Belum ada task. Tekan Tambah task untuk memulai.'
+                            : 'Tidak ada task yang sesuai. Ubah atau reset pencarian.',
+                      ),
+                    ),
+                  for (final task in p.tasks)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: TaskCard(
+                        task: task,
+                        onTap: () => widget.onTaskTap(task),
+                      ),
+                    ),
+                  if (p.moreError != null) Text(p.moreError!),
+                  if (p.state == TaskLoadState.success && p.hasMore)
+                    OutlinedButton(
+                      onPressed: p.loadingMore ? null : p.loadMore,
+                      child: Text(
+                        p.loadingMore
+                            ? 'Memuat…'
+                            : p.moreError == null
+                            ? 'Muat lagi'
+                            : 'Coba muat lagi',
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -22,9 +22,13 @@ class TaskApiService {
         case 401:
           throw const TaskApiException('Sesi berakhir. Silakan login kembali.');
         case 404:
-          throw const TaskApiException('Task tidak ditemukan atau tidak dapat diakses.');
+          throw const TaskApiException(
+            'Task tidak ditemukan atau tidak dapat diakses.',
+          );
         case 422:
-          throw const TaskApiException('Data ditolak server. Periksa isian task.');
+          throw const TaskApiException(
+            'Data ditolak server. Periksa isian task.',
+          );
       }
 
       if (error.type == DioExceptionType.connectionTimeout ||
@@ -40,7 +44,10 @@ class TaskApiService {
   }
 
   Future<dynamic> fetchTasks({Map<String, dynamic>? query}) async =>
-      (await _send(() => _dio.get<dynamic>('/tasks', queryParameters: query), 200)).data;
+      (await _send(
+        () => _dio.get<dynamic>('/tasks', queryParameters: query),
+        200,
+      )).data;
 
   Future<dynamic> fetchTask(int id) async =>
       (await _send(() => _dio.get<dynamic>('/tasks/$id'), 200)).data;
@@ -53,8 +60,7 @@ class TaskApiService {
           options: Options(contentType: Headers.jsonContentType),
         ),
         201,
-      ))
-          .data;
+      )).data;
 
   Future<dynamic> updateTask(int id, Map<String, dynamic> payload) async =>
       (await _send(
@@ -64,11 +70,9 @@ class TaskApiService {
           options: Options(contentType: Headers.jsonContentType),
         ),
         200,
-      ))
-          .data;
+      )).data;
 
   Future<void> deleteTask(int id) async {
     await _send(() => _dio.delete<dynamic>('/tasks/$id'), 204);
   }
 }
-

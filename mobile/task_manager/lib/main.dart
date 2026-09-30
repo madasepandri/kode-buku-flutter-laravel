@@ -34,24 +34,17 @@ Future<void> main() async {
     ),
   );
 
-  final taskProvider = TaskProvider(
-    TaskRepository(TaskApiService(dio)),
-  );
+  final taskProvider = TaskProvider(TaskRepository(TaskApiService(dio)));
   final authProvider = AuthProvider(
     AuthRepository(AuthApiService(dio), tokenStore),
     taskProvider,
   );
 
-  dio.interceptors.add(
-    AuthInterceptor(tokenStore, authProvider.expireSession),
-  );
+  dio.interceptors.add(AuthInterceptor(tokenStore, authProvider.expireSession));
   authProvider.restore();
 
   runApp(
-    TaskManagerApp(
-      authProvider: authProvider,
-      taskProvider: taskProvider,
-    ),
+    TaskManagerApp(authProvider: authProvider, taskProvider: taskProvider),
   );
 }
 
@@ -83,4 +76,3 @@ class TaskManagerApp extends StatelessWidget {
     );
   }
 }
-
