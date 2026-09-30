@@ -1,0 +1,89 @@
+name: Verify Chapter 14 checkpoint
+
+on:
+  push:
+    branches: [ch14-final]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  flutter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ch14-final
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Resolve Flutter dependencies
+        working-directory: mobile/task_manager
+        run: flutter pub get
+      - name: Format Flutter source
+        working-directory: mobile/task_manager
+        run: dart format lib test
+      - name: Analyze Flutter source
+        working-directory: mobile/task_manager
+        run: flutter analyze
+      - name: Run Flutter tests
+        working-directory: mobile/task_manager
+        run: flutter test
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Prepare verification-only signing key
+        working-directory: mobile/task_manager
+        run: |
+          keytool -genkeypair -keystore /tmp/ch14-verification.jks -storetype JKS -keyalg RSA -keysize 2048 -validity 1 -alias upload -storepass verification-only -keypass verification-only -dname "CN=Chapter14 Verification"
+          cat > android/key.properties <<'EOF'
+          storePassword=verification-only
+          keyPassword=verification-only
+          keyAlias=upload
+          storeFile=/tmp/ch14-verification.jks
+          EOF
+      - name: Build release APK and AAB with verification-only key
+        working-directory: mobile/task_manager
+        run: |
+          flutter build apk --release --dart-define=API_BASE_URL=https://api.example.org/api
+          flutter build appbundle --release --dart-define=API_BASE_URL=https://api.example.org/api
+          test -s build/app/outputs/flutter-apk/app-release.apk
+          test -s build/app/outputs/bundle/release/app-release.aab
+
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ch14-final
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+          extensions: sqlite3, pdo_sqlite, gd
+      - name: Validate Composer definition
+        working-directory: backend/task_api
+        run: composer validate --no-check-publish
+      - name: Install backend dependencies
+        working-directory: backend/task_api
+        run: composer install --no-interaction --prefer-dist
+      - name: Prepare backend test environment
+        working-directory: backend/task_api
+        run: cp .env.example .env
+      - name: Check PHP syntax
+        working-directory: backend/task_api
+        shell: bash
+        run: find app routes database/migrations -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Check API routes
+        working-directory: backend/task_api
+        run: php artisan route:list --path=api
+
+      - name: Test Chapter 14 API behavior
+        working-directory: backend/task_api
+        env:
+          APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+        run: php artisan test --filter=AdvancedFeaturesTest --display-warnings
