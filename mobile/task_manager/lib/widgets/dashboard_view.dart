@@ -18,12 +18,12 @@ class DashboardView extends StatelessWidget {
         children: [
           Text('Selamat datang', style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 8),
-          const Text('Lihat ringkasan task hari ini.'),
+          const Text('Ringkasan hasil pencarian pada daftar task.'),
           const SizedBox(height: 24),
           Row(children: [
-            Expanded(child: SummaryTile(label: 'Total task', value: '$totalCount', icon: Icons.assignment_outlined)),
+            Expanded(child: SummaryTile(label: 'Total hasil', value: '$totalCount', icon: Icons.assignment_outlined)),
             const SizedBox(width: 12),
-            Expanded(child: SummaryTile(label: 'Selesai', value: '$completedCount', icon: Icons.check_circle_outline)),
+            Expanded(child: SummaryTile(label: 'Selesai dimuat', value: '$completedCount', icon: Icons.check_circle_outline)),
           ]),
           const SizedBox(height: 24),
           Text('Langkah berikutnya', style: Theme.of(context).textTheme.titleLarge),
@@ -38,3 +38,4 @@ class DashboardView extends StatelessWidget {
         ],
       );
 }
+

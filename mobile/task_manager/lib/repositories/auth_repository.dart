@@ -57,5 +57,12 @@ class AuthRepository {
 
   Future<AppUser> currentUser() async => _userFromBody(await _api.currentUser());
 
+  Future<AppUser> updateProfile(String name, String email) async =>
+      _userFromBody(await _api.updateProfile(name, email));
+
+  Future<AppUser> uploadAvatar(String path, String filename) async =>
+      _userFromBody(await _api.uploadAvatar(path, filename));
+
   Future<void> logoutRemotely() => _api.logout();
 }
+

@@ -25,6 +25,7 @@ class TaskCard extends StatelessWidget {
               Text(task.title, style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 4),
               Text('Jatuh tempo: ${formatDueDate(task.dueDate)}'),
+              Text('Prioritas: ${task.priority}'),
             ])),
             const SizedBox(width: 8),
             Text(isCompleted ? 'Selesai' : 'Belum selesai'),
@@ -34,3 +35,4 @@ class TaskCard extends StatelessWidget {
     );
   }
 }
+

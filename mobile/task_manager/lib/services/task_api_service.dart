@@ -39,8 +39,8 @@ class TaskApiService {
     }
   }
 
-  Future<dynamic> fetchTasks() async =>
-      (await _send(() => _dio.get<dynamic>('/tasks'), 200)).data;
+  Future<dynamic> fetchTasks({Map<String, dynamic>? query}) async =>
+      (await _send(() => _dio.get<dynamic>('/tasks', queryParameters: query), 200)).data;
 
   Future<dynamic> fetchTask(int id) async =>
       (await _send(() => _dio.get<dynamic>('/tasks/$id'), 200)).data;
@@ -71,3 +71,4 @@ class TaskApiService {
     await _send(() => _dio.delete<dynamic>('/tasks/$id'), 204);
   }
 }
+

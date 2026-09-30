@@ -8,6 +8,7 @@ import '../widgets/dashboard_view.dart';
 import '../widgets/task_list_view.dart';
 import 'task_detail_screen.dart';
 import 'task_form_screen.dart';
+import 'profile_screen.dart';
 
 class TaskHomePage extends StatefulWidget {
   const TaskHomePage({super.key});
@@ -94,11 +95,14 @@ class _TaskHomePageState extends State<TaskHomePage> {
         completedCount: taskProvider.completedCount,
         onViewTasks: () => setState(() => _selectedIndex = 1),
       ),
-      TaskListView(tasks: taskProvider.tasks, onTaskTap: _openDetail),
+      TaskListView(onTaskTap: _openDetail),
+      const ProfileScreen(),
     ];
 
     final Widget content;
-    if (taskProvider.state == TaskLoadState.initial ||
+    if (_selectedIndex != 0) {
+      content = pages[_selectedIndex];
+    } else if (taskProvider.state == TaskLoadState.initial ||
         taskProvider.state == TaskLoadState.loading) {
       content = const Center(child: CircularProgressIndicator());
     } else if (taskProvider.state == TaskLoadState.error) {
@@ -136,7 +140,7 @@ class _TaskHomePageState extends State<TaskHomePage> {
         ],
       ),
       body: content,
-      floatingActionButton: taskProvider.state == TaskLoadState.success
+      floatingActionButton: _selectedIndex != 2 && taskProvider.state == TaskLoadState.success
           ? FloatingActionButton.extended(
               onPressed: _addTask,
               icon: const Icon(Icons.add),
@@ -147,6 +151,7 @@ class _TaskHomePageState extends State<TaskHomePage> {
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) => setState(() => _selectedIndex = index),
         destinations: const [
+
           NavigationDestination(
             icon: Icon(Icons.dashboard_outlined),
             selectedIcon: Icon(Icons.dashboard),
@@ -157,8 +162,11 @@ class _TaskHomePageState extends State<TaskHomePage> {
             selectedIcon: Icon(Icons.list_alt),
             label: 'Daftar task',
           ),
+          NavigationDestination(icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person), label: 'Profil'),
         ],
       ),
     );
   }
 }
+

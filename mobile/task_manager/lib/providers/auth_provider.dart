@@ -17,6 +17,7 @@ class AuthProvider extends ChangeNotifier {
   AppUser? _user;
   String? _errorMessage;
   bool _busy = false;
+  int _profileSession = 0;
 
   AuthState get state => _state;
   AppUser? get user => _user;
@@ -67,6 +68,7 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       final user = await _repository.login(email, password);
+      _profileSession++;
       _tasks.clearForSession();
       _user = user;
       _state = AuthState.signedIn;
@@ -90,12 +92,38 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> _endLocalSession() async {
     await _repository.clearToken();
+    _profileSession++;
     _tasks.clearForSession();
     _user = null;
     _state = AuthState.signedOut;
     _errorMessage = null;
     notifyListeners();
   }
+
+  Future<void> _saveUser(Future<AppUser> Function() operation) async {
+    if (_busy || _state != AuthState.signedIn) {
+      throw const AuthException('Sesi atau operasi profil belum siap.');
+    }
+    final session = _profileSession;
+    _busy = true;
+    notifyListeners();
+    try {
+      final saved = await operation();
+      if (session != _profileSession || _state != AuthState.signedIn) {
+        throw const AuthException('Sesi telah berubah. Buka kembali profil.');
+      }
+      _user = saved;
+    } finally {
+      _busy = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateProfile(String name, String email) =>
+      _saveUser(() => _repository.updateProfile(name, email));
+
+  Future<void> uploadAvatar(String path, String filename) =>
+      _saveUser(() => _repository.uploadAvatar(path, filename));
 
   Future<void> clearDeviceSession() => _endLocalSession();
 
@@ -117,3 +145,4 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 }
+

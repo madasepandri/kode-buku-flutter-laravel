@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'providers/auth_provider.dart';
 import 'providers/task_provider.dart';
@@ -14,8 +15,14 @@ import 'services/auth_interceptor.dart';
 import 'services/task_api_service.dart';
 import 'services/token_store.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Pilihan yang terputus tidak dikaitkan otomatis ke sesi berikutnya.
+  try {
+    await ImagePicker().retrieveLostData();
+  } catch (_) {
+    // Pengguna dapat memilih ulang dari Edit profil.
+  }
 
   final tokenStore = TokenStore(const FlutterSecureStorage());
   final dio = Dio(
@@ -76,3 +83,4 @@ class TaskManagerApp extends StatelessWidget {
     );
   }
 }
+

@@ -15,7 +15,24 @@ class TaskController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $tasks = $request->user()->tasks()->orderBy('id')->get();
+        $input = $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+            'status' => ['nullable', 'in:pending,completed'],
+            'priority' => ['nullable', 'in:low,medium,high'],
+            'page' => ['nullable', 'integer', 'min:1'],
+        ]);
+        $query = $request->user()->tasks();
+        $search = trim($input['search'] ?? '');
+        if ($search !== '') {
+            $query->where('title', 'like', '%'.$search.'%');
+        }
+        if (! empty($input['status'])) {
+            $query->where('status', $input['status']);
+        }
+        if (! empty($input['priority'])) {
+            $query->where('priority', $input['priority']);
+        }
+        $tasks = $query->orderBy('id')->paginate(10)->withQueryString();
 
         return TaskResource::collection($tasks);
     }
@@ -50,3 +67,4 @@ class TaskController extends Controller
         return response()->noContent();
     }
 }
+

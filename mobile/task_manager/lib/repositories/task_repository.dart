@@ -1,4 +1,5 @@
 import '../models/task.dart';
+import '../models/task_page.dart';
 import '../services/task_api_service.dart';
 import '../utils/task_api_exception.dart';
 
@@ -18,19 +19,16 @@ class TaskRepository {
 
   final TaskApiService _apiService;
 
-  Future<List<Task>> getTasks() async {
-    final body = await _apiService.fetchTasks();
+  Future<TaskPage> getTasks({String search = '', String? status,
+      String? priority, int page = 1}) async {
+    final body = await _apiService.fetchTasks(query: {
+      if (search.isNotEmpty) 'search': search,
+      if (status != null) 'status': status,
+      if (priority != null) 'priority': priority,
+      'page': page,
+    });
     try {
-      if (body is! Map<String, dynamic> || body['data'] is! List) {
-        throw const FormatException();
-      }
-
-      return (body['data'] as List).map((item) {
-        if (item is! Map<String, dynamic>) {
-          throw const FormatException();
-        }
-        return Task.fromJson(item);
-      }).toList(growable: false);
+      return TaskPage.fromJson(body as Map<String, dynamic>);
     } on FormatException {
       throw const TaskApiException('Format data dari server tidak sesuai.');
     } on TypeError {
@@ -64,3 +62,4 @@ class TaskRepository {
 
   Future<void> deleteTask(int id) => _apiService.deleteTask(id);
 }
+
