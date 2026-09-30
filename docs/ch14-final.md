@@ -53,4 +53,4 @@ Verifikasi pada 30 September 2026 berhasil: flutter analyze tanpa temuan, seluru
 
 Lampiran A: memilih checkpoint. B: endpoint. C: struktur. D: materi pendukung.
 
-Revisi hardening Android memakai Network Security Configuration; verifikasi run sesudah perubahan perlu dibaca terpisah dari bukti build sebelumnya.
+Verifikasi ulang setelah revisi Network Security Configuration pada 30 September 2026 berhasil: analyzer tanpa temuan, 10 test Flutter, 4 test backend (22 assertions), APK 53.2 MB dan AAB 51.9 MB. Run: https://github.com/madasepandri/kode-buku-flutter-laravel/actions/runs/36687256619. Source yang diuji: 1e54c1f4dc84a1414bf6a123c28324408f5354b2. Build memverifikasi kompilasi konfigurasi Android; penolakan HTTP saat runtime pada perangkat belum diuji. Batas pemeriksaan perangkat/server di atas tetap berlaku.
