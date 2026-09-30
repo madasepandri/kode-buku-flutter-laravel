@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../models/task.dart';
 import '../providers/task_provider.dart';
 import '../widgets/dashboard_view.dart';
 import '../widgets/task_list_view.dart';
 import 'task_detail_screen.dart';
-import 'task_form_screen.dart';
 
 class TaskHomePage extends StatefulWidget {
   const TaskHomePage({super.key});
@@ -17,26 +17,22 @@ class TaskHomePage extends StatefulWidget {
 class _TaskHomePageState extends State<TaskHomePage> {
   int _selectedIndex = 0;
 
-  Future<void> _addTask() async {
-    final result = await Navigator.of(context).push<Task>(
-      MaterialPageRoute(builder: (_) => const TaskFormScreen()),
-    );
-    if (!mounted || result == null) return;
-    context.read<TaskProvider>().addTask(result);
-    setState(() => _selectedIndex = 1);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Task ditambahkan pada daftar lokal')),
-    );
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      if (!mounted) return;
+      context.read<TaskProvider>().fetchTasks();
+    });
+  }
+
+  void _retry() {
+    context.read<TaskProvider>().fetchTasks();
   }
 
   Future<void> _openDetail(Task task) async {
-    final result = await Navigator.of(context).push<Task>(
+    await Navigator.of(context).push<void>(
       MaterialPageRoute(builder: (_) => TaskDetailScreen(task: task)),
-    );
-    if (!mounted || result == null) return;
-    context.read<TaskProvider>().updateTask(result);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Perubahan task tersimpan sementara')),
     );
   }
 
@@ -52,14 +48,28 @@ class _TaskHomePageState extends State<TaskHomePage> {
       TaskListView(tasks: taskProvider.tasks, onTaskTap: _openDetail),
     ];
 
+    final Widget content;
+    if (taskProvider.state == TaskLoadState.initial ||
+        taskProvider.state == TaskLoadState.loading) {
+      content = const Center(child: CircularProgressIndicator());
+    } else if (taskProvider.state == TaskLoadState.error) {
+      content = Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(taskProvider.errorMessage ?? 'Gagal memuat task.'),
+            TextButton(onPressed: _retry, child: const Text('Coba lagi')),
+          ],
+        ),
+      );
+    } else {
+      content = pages[_selectedIndex];
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Task Management App')),
-      body: pages[_selectedIndex],
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _addTask,
-        icon: const Icon(Icons.add),
-        label: const Text('Tambah task'),
-      ),
+      body: content,
+      floatingActionButton: null,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) => setState(() => _selectedIndex = index),
