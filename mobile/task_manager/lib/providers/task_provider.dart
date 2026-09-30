@@ -84,18 +84,18 @@ class TaskProvider extends ChangeNotifier {
     try {
       final result = await _repository.getTasks(
         search: _search, status: _status, priority: _priority);
-      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) return;
+      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) { return; }
       _tasks = result.items;
       _page = result.currentPage;
       _lastPage = result.lastPage;
       _total = result.total;
       _state = TaskLoadState.success;
     } on TaskApiException catch (error) {
-      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) return;
+      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) { return; }
       _state = TaskLoadState.error;
       _errorMessage = error.message;
     } catch (_) {
-      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) return;
+      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) { return; }
       _state = TaskLoadState.error;
       _errorMessage = 'Data task tidak dapat diproses.';
     }
@@ -105,7 +105,7 @@ class TaskProvider extends ChangeNotifier {
   }
 
   Future<void> loadMore() async {
-    if (_state != TaskLoadState.success || _loadingMore || !hasMore) return;
+    if (_state != TaskLoadState.success || _loadingMore || !hasMore) { return; }
     final generation = _sessionGeneration;
     final queryGeneration = _queryGeneration;
     _loadingMore = true;
@@ -114,17 +114,17 @@ class TaskProvider extends ChangeNotifier {
     try {
       final result = await _repository.getTasks(search: _search,
         status: _status, priority: _priority, page: _page + 1);
-      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) return;
+      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) { return; }
       final ids = _tasks.map((task) => task.id).toSet();
       _tasks = [..._tasks, ...result.items.where((task) => ids.add(task.id))];
       _page = result.currentPage;
       _lastPage = result.lastPage;
       _total = result.total;
     } on TaskApiException catch (error) {
-      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) return;
+      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) { return; }
       _moreError = error.message;
     } catch (_) {
-      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) return;
+      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) { return; }
       _moreError = 'Halaman berikutnya gagal diproses.';
     } finally {
       if (_isCurrent(generation) && queryGeneration == _queryGeneration) {
@@ -166,7 +166,7 @@ class TaskProvider extends ChangeNotifier {
   Future<void> deleteTask(int id) async {
     final generation = _sessionGeneration;
     await _repository.deleteTask(id);
-    if (!_isCurrent(generation)) return;
+    if (!_isCurrent(generation)) { return; }
     await fetchTasks();
   }
 }

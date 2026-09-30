@@ -10,7 +10,7 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     final user = auth.user;
-    if (user == null) return const SizedBox.shrink();
+    if (user == null) { return const SizedBox.shrink(); }
     return ListView(padding: const EdgeInsets.all(24), children: [
       Center(child: UserAvatar(url: user.avatarUrl)),
       const SizedBox(height: 16),

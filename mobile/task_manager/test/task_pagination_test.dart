@@ -51,7 +51,7 @@ void main() {
   });
   test('load more failure preserves loaded items and page for retry', () async {
     final p = TaskProvider(FakeRepository((search, current) async {
-      if (current == 2) throw const TaskApiException('offline');
+      if (current == 2) { throw const TaskApiException('offline'); }
       return page([1], current);
     }));
     addTearDown(p.dispose);

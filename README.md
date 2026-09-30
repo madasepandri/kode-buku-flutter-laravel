@@ -1,34 +1,16 @@
-# Buku Flutter Laravel
+# Buku Flutter Laravel — Checkpoint Bab 13
 
-Repository pendamping buku *Flutter untuk Aplikasi Mobile: Dari UI hingga Integrasi Backend Laravel*. Satu studi kasus, **Task Management App**, dikembangkan bertahap dari proyek Flutter awal sampai aplikasi Android yang terhubung dengan REST API Laravel dan MySQL.
+Repository pendamping buku *Flutter untuk Aplikasi Mobile: Dari UI hingga Integrasi Backend Laravel*.
 
-## Struktur yang direncanakan
+Branch: **ch13-advanced-features**, melanjutkan **ch12-auth-integration**.
 
-```text
-mobile/task_manager/   Proyek Flutter (mulai Bab 2)
-backend/task_api/      Proyek Laravel (mulai Bab 7)
-docs/                  Catatan pendamping buku
-screenshots/           Gambar hasil praktik bila diperlukan
-```
+Task Management App menggunakan Flutter, Provider, Dio, Flutter Secure Storage, Laravel 13, Sanctum dan MySQL. Search/filter/pagination/pull-to-refresh serta profil/edit profil/avatar melanjutkan CRUD dan authentication sebelumnya.
 
-Folder akan ditambahkan pada bab yang membuat isinya. Bab 2 menggunakan proyek Flutter bawaan; backend belum dibuat.
+- Flutter: `mobile/task_manager`
+- Laravel: `backend/task_api`
+- [Panduan dan kontrak Bab 13](docs/ch13-advanced-features.md)
+- [Verifikasi otomatis](.github/workflows/verify-ch13.yml)
 
-## Stack buku
+Ikuti petunjuk konfigurasi database, APP_URL, storage:link dan API_BASE_URL pada panduan. Tidak menggunakan DEMO_API_TOKEN. Android minimum API 24; avatar galeri JPG/PNG maksimal 2 MB.
 
-Flutter dan Dart, Material Design, Provider, Dio, Flutter Secure Storage, Laravel REST API, Sanctum, Eloquent, MySQL, Postman, Git, dan GitHub. Versi SDK dan dependency akan dicatat pada checkpoint teknis setelah proyek dihasilkan dan diperiksa.
-
-## Checkpoint
-
-`ch02-project-init` menandai proyek Flutter awal yang berhasil dijalankan pada Android. Branch tersebut dibuat setelah `flutter create --platforms=android task_manager` dijalankan dari folder `mobile/` dan hasilnya diverifikasi dengan `flutter doctor`, `flutter devices`, serta `flutter run`.
-
-## Menjalankan proyek Bab 2
-
-Setelah branch `ch02-project-init` tersedia:
-
-```bash
-cd mobile/task_manager
-flutter pub get
-flutter run
-```
-
-Panduan instalasi khusus sistem operasi: [Flutter](https://docs.flutter.dev/install) dan [Flutter untuk Android](https://docs.flutter.dev/platform-integration/android/setup).
+Empat screenshot naskah: Search Task, Filter Task, Profile, Edit Profile. Uji perangkat dan MySQL mengikuti acceptance check buku.

@@ -36,7 +36,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() { _working = true; _message = null; });
     try {
       final file = await _picker.pickImage(source: ImageSource.gallery);
-      if (file == null) return;
+      if (file == null) { return; }
       if (await file.length() > 2 * 1024 * 1024) {
         throw const AuthException('Ukuran gambar maksimal 2 MB.');
       }
@@ -44,36 +44,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (!['jpg', 'jpeg', 'png'].contains(extension)) {
         throw const AuthException('Pilih gambar JPG atau PNG.');
       }
-      if (mounted) setState(() => _selected = file);
+      if (mounted) { setState(() => _selected = file); }
     } on PlatformException {
-      if (mounted) setState(() => _message = 'Galeri belum dapat dibuka. Coba lagi.');
+      if (mounted) { setState(() => _message = 'Galeri belum dapat dibuka. Coba lagi.'); }
     } on AuthException catch (error) {
-      if (mounted) setState(() => _message = error.message);
+      if (mounted) { setState(() => _message = error.message); }
     } catch (_) {
-      if (mounted) setState(() => _message = 'Gambar belum dapat dibaca. Pilih kembali.');
+      if (mounted) { setState(() => _message = 'Gambar belum dapat dibaca. Pilih kembali.'); }
     } finally {
-      if (mounted) setState(() => _working = false);
+      if (mounted) { setState(() => _working = false); }
     }
   }
 
   Future<void> _saveProfile() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) { return; }
     setState(() { _working = true; _message = null; });
     try {
       await context.read<AuthProvider>().updateProfile(_name.text, _email.text);
-      if (mounted) setState(() => _message = 'Nama dan email berhasil disimpan.');
+      if (mounted) { setState(() => _message = 'Nama dan email berhasil disimpan.'); }
     } on AuthException catch (error) {
-      if (mounted) setState(() => _message = error.message);
+      if (mounted) { setState(() => _message = error.message); }
     } catch (_) {
-      if (mounted) setState(() => _message = 'Profil belum dapat disimpan. Coba lagi.');
+      if (mounted) { setState(() => _message = 'Profil belum dapat disimpan. Coba lagi.'); }
     } finally {
-      if (mounted) setState(() => _working = false);
+      if (mounted) { setState(() => _working = false); }
     }
   }
 
   Future<void> _uploadAvatar() async {
     final selected = _selected;
-    if (selected == null) return;
+    if (selected == null) { return; }
     setState(() { _working = true; _message = null; });
     try {
       await context.read<AuthProvider>().uploadAvatar(selected.path, selected.name);
@@ -82,11 +82,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _message = 'Avatar berhasil diunggah.';
       }); }
     } on AuthException catch (error) {
-      if (mounted) setState(() => _message = error.message);
+      if (mounted) { setState(() => _message = error.message); }
     } catch (_) {
-      if (mounted) setState(() => _message = 'Avatar belum dapat diunggah. Coba lagi.');
+      if (mounted) { setState(() => _message = 'Avatar belum dapat diunggah. Coba lagi.'); }
     } finally {
-      if (mounted) setState(() => _working = false);
+      if (mounted) { setState(() => _working = false); }
     }
   }
 
