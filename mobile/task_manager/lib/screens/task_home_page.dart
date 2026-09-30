@@ -6,6 +6,7 @@ import '../providers/task_provider.dart';
 import '../widgets/dashboard_view.dart';
 import '../widgets/task_list_view.dart';
 import 'task_detail_screen.dart';
+import 'task_form_screen.dart';
 
 class TaskHomePage extends StatefulWidget {
   const TaskHomePage({super.key});
@@ -26,13 +27,28 @@ class _TaskHomePageState extends State<TaskHomePage> {
     });
   }
 
-  void _retry() {
+  void _refreshTasks() {
     context.read<TaskProvider>().fetchTasks();
   }
 
+  Future<void> _addTask() async {
+    final saved = await Navigator.of(context).push<Task>(
+      MaterialPageRoute(builder: (_) => const TaskFormScreen()),
+    );
+    if (!mounted || saved == null) return;
+    setState(() => _selectedIndex = 1);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Task berhasil ditambahkan.')),
+    );
+  }
+
   Future<void> _openDetail(Task task) async {
-    await Navigator.of(context).push<void>(
+    final deleted = await Navigator.of(context).push<bool>(
       MaterialPageRoute(builder: (_) => TaskDetailScreen(task: task)),
+    );
+    if (!mounted || deleted != true) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Task berhasil dihapus.')),
     );
   }
 
@@ -58,7 +74,7 @@ class _TaskHomePageState extends State<TaskHomePage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(taskProvider.errorMessage ?? 'Gagal memuat task.'),
-            TextButton(onPressed: _retry, child: const Text('Coba lagi')),
+            TextButton(onPressed: _refreshTasks, child: const Text('Coba lagi')),
           ],
         ),
       );
@@ -67,9 +83,26 @@ class _TaskHomePageState extends State<TaskHomePage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Task Management App')),
+      appBar: AppBar(
+        title: const Text('Task Management App'),
+        actions: [
+          IconButton(
+            tooltip: 'Muat ulang task',
+            onPressed: taskProvider.state == TaskLoadState.loading
+                ? null
+                : _refreshTasks,
+            icon: const Icon(Icons.refresh),
+          ),
+        ],
+      ),
       body: content,
-      floatingActionButton: null,
+      floatingActionButton: taskProvider.state == TaskLoadState.success
+          ? FloatingActionButton.extended(
+              onPressed: _addTask,
+              icon: const Icon(Icons.add),
+              label: const Text('Tambah task'),
+            )
+          : null,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) => setState(() => _selectedIndex = index),
