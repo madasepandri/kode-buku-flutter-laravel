@@ -19,13 +19,13 @@ class DashboardView extends StatelessWidget {
     children: [
       Text('Selamat datang', style: Theme.of(context).textTheme.headlineMedium),
       const SizedBox(height: 8),
-      const Text('Ringkasan hasil pencarian pada daftar task.'),
+      const Text('Ringkasan task yang telah dimuat.'),
       const SizedBox(height: 24),
       Row(
         children: [
           Expanded(
             child: SummaryTile(
-              label: 'Total hasil',
+              label: 'Task dimuat',
               value: '$totalCount',
               icon: Icons.assignment_outlined,
             ),
@@ -40,6 +40,8 @@ class DashboardView extends StatelessWidget {
           ),
         ],
       ),
+      const SizedBox(height: 12),
+      const Text('Angka mengikuti pencarian dan filter aktif, serta halaman yang telah dimuat.'),
       const SizedBox(height: 24),
       Text('Langkah berikutnya', style: Theme.of(context).textTheme.titleLarge),
       const SizedBox(height: 8),

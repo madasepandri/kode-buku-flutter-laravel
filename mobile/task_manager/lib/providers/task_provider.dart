@@ -25,6 +25,8 @@ class TaskProvider extends ChangeNotifier {
   int _total = 0;
   bool _loadingMore = false;
   String? _moreError;
+  bool _refreshing = false;
+  String? _refreshError;
 
   String get search => _search;
   String? get status => _status;
@@ -33,6 +35,8 @@ class TaskProvider extends ChangeNotifier {
   bool get loadingMore => _loadingMore;
   bool get hasMore => _page < _lastPage;
   String? get moreError => _moreError;
+  bool get refreshing => _refreshing;
+  String? get refreshError => _refreshError;
 
   UnmodifiableListView<Task> get tasks => UnmodifiableListView(_tasks);
   TaskLoadState get state => _state;
@@ -54,6 +58,8 @@ class TaskProvider extends ChangeNotifier {
     _total = 0;
     _loadingMore = false;
     _moreError = null;
+    _refreshing = false;
+    _refreshError = null;
     _tasks = [];
     _state = TaskLoadState.initial;
     _errorMessage = null;
@@ -82,6 +88,8 @@ class TaskProvider extends ChangeNotifier {
     _errorMessage = null;
     _moreError = null;
     _loadingMore = false;
+    _refreshing = false;
+    _refreshError = null;
     notifyListeners();
 
     try {
@@ -116,8 +124,50 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> refreshTasks() async {
+    if (_refreshing) { return; }
+    if (_state != TaskLoadState.success) {
+      await fetchTasks();
+      return;
+    }
+    final generation = _sessionGeneration;
+    final queryGeneration = ++_queryGeneration;
+    _refreshing = true;
+    _refreshError = null;
+    _loadingMore = false;
+    _moreError = null;
+    notifyListeners();
+    try {
+      final result = await _repository.getTasks(
+        search: _search, status: _status, priority: _priority);
+      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) {
+        return;
+      }
+      _tasks = result.items;
+      _page = result.currentPage;
+      _lastPage = result.lastPage;
+      _total = result.total;
+    } on TaskApiException catch (error) {
+      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) {
+        return;
+      }
+      _refreshError = error.message;
+    } catch (_) {
+      if (!_isCurrent(generation) || queryGeneration != _queryGeneration) {
+        return;
+      }
+      _refreshError = 'Daftar belum dapat diperbarui. Coba lagi.';
+    } finally {
+      if (_isCurrent(generation) && queryGeneration == _queryGeneration) {
+        _refreshing = false;
+        notifyListeners();
+      }
+    }
+  }
+
   Future<void> loadMore() async {
-    if (_state != TaskLoadState.success || _loadingMore || !hasMore) {
+    if (_state != TaskLoadState.success || _loadingMore || _refreshing ||
+        _refreshError != null || !hasMore) {
       return;
     }
     final generation = _sessionGeneration;
@@ -177,7 +227,7 @@ class TaskProvider extends ChangeNotifier {
         'Sesi telah berubah. Ulangi operasi pada akun aktif.',
       );
     }
-    await fetchTasks();
+    await refreshTasks();
     return saved;
   }
 
@@ -189,7 +239,7 @@ class TaskProvider extends ChangeNotifier {
         'Sesi telah berubah. Ulangi operasi pada akun aktif.',
       );
     }
-    await fetchTasks();
+    await refreshTasks();
     return saved;
   }
 
@@ -199,6 +249,6 @@ class TaskProvider extends ChangeNotifier {
     if (!_isCurrent(generation)) {
       return;
     }
-    await fetchTasks();
+    await refreshTasks();
   }
 }

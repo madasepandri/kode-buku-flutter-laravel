@@ -29,8 +29,13 @@ class _TaskHomePageState extends State<TaskHomePage> {
     });
   }
 
-  void _refreshTasks() {
-    context.read<TaskProvider>().fetchTasks();
+  Future<void> _refreshTasks() async {
+    final provider = context.read<TaskProvider>();
+    await provider.refreshTasks();
+    if (!mounted || provider.refreshError == null) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Daftar belum diperbarui. ${provider.refreshError}')),
+    );
   }
 
   Future<void> _addTask() async {
@@ -89,7 +94,7 @@ class _TaskHomePageState extends State<TaskHomePage> {
     final auth = context.watch<AuthProvider>();
     final pages = [
       DashboardView(
-        totalCount: taskProvider.totalCount,
+        totalCount: taskProvider.tasks.length,
         completedCount: taskProvider.completedCount,
         onViewTasks: () => setState(() => _selectedIndex = 1),
       ),
@@ -130,7 +135,7 @@ class _TaskHomePageState extends State<TaskHomePage> {
         actions: [
           IconButton(
             tooltip: 'Muat ulang task',
-            onPressed: taskProvider.state == TaskLoadState.loading
+            onPressed: taskProvider.state == TaskLoadState.loading || taskProvider.refreshing
                 ? null
                 : _refreshTasks,
             icon: const Icon(Icons.refresh),

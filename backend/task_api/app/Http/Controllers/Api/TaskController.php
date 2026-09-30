@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\IndexTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use Illuminate\Http\JsonResponse;
@@ -13,14 +14,9 @@ use Illuminate\Http\Response;
 
 class TaskController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(IndexTaskRequest $request): AnonymousResourceCollection
     {
-        $input = $request->validate([
-            'search' => ['nullable', 'string', 'max:100'],
-            'status' => ['nullable', 'in:pending,completed'],
-            'priority' => ['nullable', 'in:low,medium,high'],
-            'page' => ['nullable', 'integer', 'min:1'],
-        ]);
+        $input = $request->validated();
         $query = $request->user()->tasks();
         $search = trim($input['search'] ?? '');
         if ($search !== '') {

@@ -5,13 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Requests\UploadAvatarRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -54,23 +55,16 @@ class AuthController extends Controller
         return response()->json(['data' => $this->userData($request->user())]);
     }
 
-    public function updateUser(Request $request): JsonResponse
+    public function updateUser(UpdateProfileRequest $request): JsonResponse
     {
         $user = $request->user();
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255',
-                Rule::unique('users', 'email')->ignore($user->id)],
-        ]);
+        $data = $request->validated();
         $user->fill($data)->save();
         return response()->json(['data' => $this->userData($user->refresh())]);
     }
 
-    public function uploadAvatar(Request $request): JsonResponse
+    public function uploadAvatar(UploadAvatarRequest $request): JsonResponse
     {
-        $request->validate([
-            'avatar' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-        ]);
         $user = $request->user();
         $oldPath = $user->avatar;
         $path = $request->file('avatar')->store('avatars', 'public');

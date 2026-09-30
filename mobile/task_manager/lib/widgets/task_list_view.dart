@@ -119,10 +119,10 @@ class _TaskListViewState extends State<TaskListView> {
               ),
             ],
           ),
-          if (loading) const LinearProgressIndicator(),
+          if (loading || p.refreshing) const LinearProgressIndicator(),
           Expanded(
             child: RefreshIndicator(
-              onRefresh: p.fetchTasks,
+              onRefresh: p.refreshTasks,
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
@@ -144,6 +144,11 @@ class _TaskListViewState extends State<TaskListView> {
                             : 'Tidak ada task yang sesuai. Ubah atau reset pencarian.',
                       ),
                     ),
+                  if (p.refreshError != null) ...[
+                    Text('Daftar belum diperbarui. ${p.refreshError}'),
+                    TextButton(onPressed: p.refreshing ? null : p.refreshTasks,
+                      child: const Text('Coba perbarui lagi')),
+                  ],
                   for (final task in p.tasks)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12),
@@ -155,7 +160,8 @@ class _TaskListViewState extends State<TaskListView> {
                   if (p.moreError != null) Text(p.moreError!),
                   if (p.state == TaskLoadState.success && p.hasMore)
                     OutlinedButton(
-                      onPressed: p.loadingMore ? null : p.loadMore,
+                      onPressed: p.loadingMore || p.refreshing || p.refreshError != null
+                          ? null : p.loadMore,
                       child: Text(
                         p.loadingMore
                             ? 'Memuat…'

@@ -4,9 +4,10 @@ Dasar: `ch12-auth-integration`. Stack dan satu Dio tetap digunakan.
 
 - `GET /api/tasks`: search pada title, status pending/completed, priority low/medium/high, page; paginate(10), orderBy(id), data/links/meta.
 - Search saat submit; filter dan Reset memuat page 1; Muat lagi menambahkan ID unik; kegagalan halaman lanjutan mempertahankan data dan nomor halaman.
-- Pull-to-refresh memuat page 1 dan mempertahankan query. CRUD memuat ulang page 1 setelah server mengonfirmasi mutasi.
-- Dashboard: Total hasil berasal dari meta.total untuk query aktif; Selesai dimuat berasal dari snapshot yang sudah dimuat. Label tidak mengklaim statistik global.
+- fetchTasks memuat awal/perubahan query; refreshTasks mempertahankan snapshot dan metadata selama memuat page 1. Gagal refresh menampilkan refreshError tanpa menghapus data. CRUD dan pull-to-refresh memakai refreshTasks; query tetap aktif.
+- Dashboard: Task dimuat dan Selesai dimuat sama-sama merangkum snapshot query aktif. Total seluruh hasil query hanya ditampilkan pada daftar melalui meta.total.
 - Profil destination ketiga; AuthProvider satu pemilik user. PUT /api/user untuk nama/email; POST /api/user/avatar multipart avatar JPG/PNG maksimal 2048 KB.
+- Validasi memakai IndexTaskRequest, UpdateProfileRequest dan UploadAvatarRequest; controller menggunakan validated(), sesuai Bab 8.
 - avatar_url merupakan URL publik, bukan path lokal. Kolom avatar sudah ada dari Bab 7. Gambar menggunakan nama baru saat upload; avatar lama dihapus setelah DB tersimpan.
 - Android API 24+; image_picker 1.2.3. Galeri saja. Pilihan yang terputus saat proses dihentikan dibersihkan pada startup; pengguna memilih ulang sesudah sesi dipulihkan.
 
