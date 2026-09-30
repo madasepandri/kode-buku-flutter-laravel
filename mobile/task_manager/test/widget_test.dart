@@ -1,31 +1,44 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:task_manager/main.dart';
+import 'package:provider/provider.dart';
+import 'package:task_manager/providers/auth_provider.dart';
+import 'package:task_manager/providers/task_provider.dart';
+import 'package:task_manager/repositories/auth_repository.dart';
+import 'package:task_manager/repositories/task_repository.dart';
+import 'package:task_manager/screens/login_screen.dart';
+import 'package:task_manager/services/auth_api_service.dart';
+import 'package:task_manager/services/task_api_service.dart';
+import 'package:task_manager/services/token_store.dart';
 
 void main() {
-  testWidgets('form, navigation, and local task flow', (tester) async {
-    await tester.pumpWidget(const TaskManagerApp());
+  testWidgets('login form validates required fields', (tester) async {
+    final dio = Dio();
+    final taskProvider = TaskProvider(TaskRepository(TaskApiService(dio)));
+    final authProvider = AuthProvider(
+      AuthRepository(
+        AuthApiService(dio),
+        TokenStore(const FlutterSecureStorage()),
+      ),
+      taskProvider,
+    );
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
+          ChangeNotifierProvider<TaskProvider>.value(value: taskProvider),
+        ],
+        child: const MaterialApp(home: LoginScreen()),
+      ),
+    );
+
     expect(find.text('Login'), findsOneWidget);
     await tester.tap(find.text('Masuk'));
     await tester.pump();
+
     expect(find.text('Email wajib diisi'), findsOneWidget);
-
-    await tester.enterText(find.byType(TextFormField).at(0), 'demo@example.com');
-    await tester.enterText(find.byType(TextFormField).at(1), 'contoh');
-    await tester.tap(find.text('Masuk'));
-    await tester.pump(const Duration(milliseconds: 700));
-    await tester.pumpAndSettle();
-    expect(find.text('Total task'), findsOneWidget);
-    expect(find.text('5'), findsOneWidget);
-
-    await tester.tap(find.text('Lihat daftar task'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Menyusun laporan'));
-    await tester.pumpAndSettle();
-    expect(find.text('Detail task'), findsOneWidget);
-    await tester.tap(find.text('Edit task'));
-    await tester.pumpAndSettle();
-    expect(find.text('Menyusun laporan'), findsOneWidget);
-    expect(find.text('Simpan task'), findsOneWidget);
+    expect(find.text('Kata sandi wajib diisi'), findsOneWidget);
   });
 }
