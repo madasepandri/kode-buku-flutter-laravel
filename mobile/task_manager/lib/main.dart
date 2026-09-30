@@ -10,6 +10,7 @@ import 'repositories/auth_repository.dart';
 import 'repositories/task_repository.dart';
 import 'screens/auth_gate.dart';
 import 'services/api_config.dart';
+import 'services/debug_api_logger.dart';
 import 'services/auth_api_service.dart';
 import 'services/auth_interceptor.dart';
 import 'services/task_api_service.dart';
@@ -17,6 +18,7 @@ import 'services/token_store.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  ApiConfig.validate();
   // Pilihan yang terputus tidak dikaitkan otomatis ke sesi berikutnya.
   try {
     await ImagePicker().retrieveLostData();
@@ -41,6 +43,7 @@ Future<void> main() async {
   );
 
   dio.interceptors.add(AuthInterceptor(tokenStore, authProvider.expireSession));
+  dio.interceptors.add(DebugApiLogger());
   authProvider.restore();
 
   runApp(
