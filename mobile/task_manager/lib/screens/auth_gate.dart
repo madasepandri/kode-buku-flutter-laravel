@@ -37,9 +37,37 @@ class AuthGate extends StatelessWidget {
         ),
     };
 
-    return Navigator(
+    return _GateNavigator(
       key: ValueKey('${auth.state}-${auth.user?.id}'),
-      onGenerateRoute: (_) => MaterialPageRoute<void>(builder: (_) => page),
+      page: page,
+    );
+  }
+}
+
+// Navigator bersarang tidak menerima tombol Back sistem dari route utama.
+// NavigatorPopHandler meneruskannya, sehingga Back menutup layar teratas
+// lebih dulu dan baru menutup aplikasi dari layar paling awal.
+class _GateNavigator extends StatefulWidget {
+  const _GateNavigator({super.key, required this.page});
+
+  final Widget page;
+
+  @override
+  State<_GateNavigator> createState() => _GateNavigatorState();
+}
+
+class _GateNavigatorState extends State<_GateNavigator> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return NavigatorPopHandler(
+      onPopWithResult: (_) => _navigatorKey.currentState?.maybePop(),
+      child: Navigator(
+        key: _navigatorKey,
+        onGenerateRoute: (_) =>
+            MaterialPageRoute<void>(builder: (_) => widget.page),
+      ),
     );
   }
 }
