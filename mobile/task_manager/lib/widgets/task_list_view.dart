@@ -125,6 +125,8 @@ class _TaskListViewState extends State<TaskListView> {
               onRefresh: p.refreshTasks,
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
+                // Ruang bawah agar FAB tidak menutupi item terakhir.
+                padding: const EdgeInsets.only(bottom: 88),
                 children: [
                   if (p.state == TaskLoadState.error) ...[
                     Text(p.errorMessage ?? 'Task gagal dimuat.'),
