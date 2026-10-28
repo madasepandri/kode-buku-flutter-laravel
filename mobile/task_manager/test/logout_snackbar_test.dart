@@ -16,7 +16,7 @@ import 'package:task_manager/services/token_store.dart';
 
 class _FakeAuthRepo extends AuthRepository {
   _FakeAuthRepo({required this.failClear})
-      : super(AuthApiService(Dio()), TokenStore(const FlutterSecureStorage()));
+    : super(AuthApiService(Dio()), TokenStore(const FlutterSecureStorage()));
   final bool failClear;
   bool cleared = false;
 
@@ -42,27 +42,33 @@ class _FakeTaskRepo extends TaskRepository {
     String? status,
     String? priority,
     int page = 1,
-  }) async =>
-      const TaskPage(items: [], currentPage: 1, lastPage: 1, total: 0);
+  }) async => const TaskPage(items: [], currentPage: 1, lastPage: 1, total: 0);
 }
 
-Future<AuthProvider> _pump(WidgetTester tester, {required bool failClear}) async {
+Future<AuthProvider> _pump(
+  WidgetTester tester, {
+  required bool failClear,
+}) async {
   final tasks = TaskProvider(_FakeTaskRepo());
   final auth = AuthProvider(_FakeAuthRepo(failClear: failClear), tasks);
   await auth.login('uji@example.test', 'x');
-  await tester.pumpWidget(MultiProvider(
-    providers: [
-      ChangeNotifierProvider<AuthProvider>.value(value: auth),
-      ChangeNotifierProvider<TaskProvider>.value(value: tasks),
-    ],
-    child: const MaterialApp(home: TaskHomePage()),
-  ));
+  await tester.pumpWidget(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<AuthProvider>.value(value: auth),
+        ChangeNotifierProvider<TaskProvider>.value(value: tasks),
+      ],
+      child: const MaterialApp(home: TaskHomePage()),
+    ),
+  );
   await tester.pumpAndSettle();
   return auth;
 }
 
 void main() {
-  testWidgets('SnackBar muncul bila sesi lokal gagal dibersihkan', (tester) async {
+  testWidgets('SnackBar muncul bila sesi lokal gagal dibersihkan', (
+    tester,
+  ) async {
     final auth = await _pump(tester, failClear: true);
     await tester.tap(find.byTooltip('Logout'));
     await tester.pumpAndSettle();
@@ -79,7 +85,9 @@ void main() {
     await tester.tap(find.byTooltip('Logout'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Keluar'));
-    await tester.pump(const Duration(milliseconds: 500)); // gate belum ada di test ini; spinner tidak pernah settle
+    await tester.pump(
+      const Duration(milliseconds: 500),
+    ); // gate belum ada di test ini; spinner tidak pernah settle
     expect(find.text('Sesi lokal belum dapat dibersihkan.'), findsNothing);
     expect(auth.state, AuthState.signedOut);
   });
