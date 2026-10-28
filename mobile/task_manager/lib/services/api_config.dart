@@ -8,7 +8,8 @@ class ApiConfig {
 
   static void validate() {
     final uri = Uri.tryParse(baseUrl);
-    if (uri == null || uri.host.isEmpty ||
+    if (uri == null ||
+        uri.host.isEmpty ||
         (uri.scheme != 'http' && uri.scheme != 'https')) {
       throw StateError('API_BASE_URL harus berupa URL HTTP/HTTPS yang valid.');
     }

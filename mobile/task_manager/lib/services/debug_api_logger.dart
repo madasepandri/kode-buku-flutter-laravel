@@ -15,15 +15,17 @@ class DebugApiLogger extends Interceptor {
   }
 
   @override
-  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
+  void onResponse(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) {
     _write(response.requestOptions, '${response.statusCode}');
     handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    _write(err.requestOptions,
-        '${err.response?.statusCode ?? err.type.name}');
+    _write(err.requestOptions, '${err.response?.statusCode ?? err.type.name}');
     handler.next(err);
   }
 }
