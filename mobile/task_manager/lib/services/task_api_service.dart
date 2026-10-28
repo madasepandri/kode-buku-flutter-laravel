@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import '../utils/task_api_exception.dart';
 
 class TaskApiService {
-  TaskApiService(this._dio, {required String token}) : _token = token;
+  TaskApiService(this._dio, {required this._token});
 
   final Dio _dio;
   final String _token;
