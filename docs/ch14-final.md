@@ -19,7 +19,7 @@ flutter analyze
 flutter test
 ```
 
-test/widget_test.dart memakai LoginScreen dan dependency yang sudah ada. Form kosong berhenti sebelum API/storage. task_provider_test.dart dan task_pagination_test.dart tetap dijalankan. logout_snackbar_test.dart memeriksa SnackBar saat sesi lokal gagal dibersihkan dan logout normal pada TaskHomePage.
+test/widget_test.dart memakai LoginScreen dan dependency yang sudah ada. Form kosong berhenti sebelum API/storage. task_provider_test.dart dan task_pagination_test.dart tetap dijalankan. logout_snackbar_test.dart memeriksa SnackBar saat sesi lokal gagal dibersihkan dan logout normal pada TaskHomePage. task_detail_edit_test.dart memeriksa bahwa setelah edit task, detail menampilkan data baru dan SnackBar "Task berhasil diperbarui." muncul.
 
 ## API
 Postman tetap alat pengujian utama buku. Gunakan dua akun latihan, satu task A dengan ID diketahui, lalu periksa 401 tanpa token, 422 input invalid, dan 404 saat B mencoba GET/PUT/DELETE task A. Lima skenario smoke test: jalur CRUD/query berhasil, validasi 422, autentikasi 401, isolasi kepemilikan 404, dan pencabutan token saat logout. Profil/avatar diperiksa pada perjalanan perangkat. Jangan ekspor token/password ke repository.
@@ -56,3 +56,5 @@ Lampiran A: memilih checkpoint. B: endpoint. C: struktur. D: materi pendukung.
 Verifikasi ulang setelah revisi Network Security Configuration pada 30 September 2026 berhasil: analyzer tanpa temuan, 10 test Flutter, 4 test backend (22 assertions), APK 53.2 MB dan AAB 51.9 MB. Run: https://github.com/madasepandri/kode-buku-flutter-laravel/actions/runs/36687256619. Source yang diuji: 1e54c1f4dc84a1414bf6a123c28324408f5354b2. Build memverifikasi kompilasi konfigurasi Android; penolakan HTTP saat runtime pada perangkat belum diuji. Batas pemeriksaan perangkat/server di atas tetap berlaku.
 
 Verifikasi lokal pada 28 Oktober 2026 (Flutter 3.47.8, emulator Android 16/API 36): flutter analyze tanpa temuan, 12 test Flutter lulus, build APK release 53,2 MB dan AAB 52,0 MB dengan keystore sementara. Tombol Back pada AuthGate sudah diuji: dari form dan detail kembali ke layar sebelumnya, dan dari layar awal menutup aplikasi. Build release dengan API_BASE_URL HTTP ditolak saat startup (Bad state: Build release harus menggunakan API_BASE_URL HTTPS). Ini bukan hasil CI. Uji path Windows pada storeFile dan perangkat fisik belum dilakukan.
+
+Verifikasi lokal pada 29 Oktober 2026 (Flutter 3.47.8, emulator Android 16/API 36): flutter analyze tanpa temuan dan 13 test Flutter lulus. Pada emulator, edit task lewat form memperbarui detail beserta SnackBar, token yang dicabut di server (401) mengembalikan aplikasi ke layar Login dan tidak dipulihkan saat aplikasi dibuka ulang, serta tombol Tambah task tidak lagi menutupi item terakhir dan tombol Muat lagi. Ini bukan hasil CI. Perangkat fisik, HTTPS server sungguhan, dan path Windows pada storeFile belum diuji.
