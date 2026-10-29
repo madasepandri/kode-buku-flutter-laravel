@@ -37,7 +37,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       context,
     ).push<Task>(MaterialPageRoute(builder: (_) => TaskFormScreen(task: task)));
     if (!mounted || saved == null) return;
-    setState(() => _detailFuture = Future.value(saved));
+    setState(() {
+      _detailFuture = Future.value(saved);
+    });
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Task berhasil diperbarui.')));
